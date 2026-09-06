@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.jobscoutos.latest</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__PYTHON__</string>
+    <string>__REPO__/scripts/jobscoutos_update_latest.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__REPO__</string>
+  <key>WatchPaths</key>
+  <array>
+    <!-- Any write in a digest family dir (local skill run, retention
+         prune) re-points the root pointer notes. The vault root is
+         watched for Dashboard.md/Strategy.md edits; pointer writes re-trigger
+         one throttled, idempotent no-op run - by design. -->
+    <string>__REPO__/vault/Daily Digests</string>
+    <string>__REPO__/vault/Market Intel</string>
+    <string>__REPO__/vault/Archive/Daily Marketing Brief</string>
+    <string>__REPO__/vault</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+  <key>StandardOutPath</key>
+  <string>__STATE_DIR__/logs/latest.out</string>
+  <key>StandardErrorPath</key>
+  <string>__STATE_DIR__/logs/latest.err</string>
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>

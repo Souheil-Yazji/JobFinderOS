@@ -1,0 +1,37 @@
+# JobScoutOS — ATS board registry + filters for the deterministic poller
+# (scripts/jobscoutos_ats_poll.py). Copy to config/ats_boards.yaml (gitignored)
+# and edit. The poller falls back to this example file if no copy exists.
+#
+# Board fields:
+#   company : display name
+#   ats     : greenhouse | ashby | lever   (clean public JSON APIs)
+#   slug    : the org slug in that ATS (look at the company's careers URL)
+#   tier    : 1 = a top target (hub-city-only reqs still surface, with a relocation flag)
+#             2 = a standard target  |  any other string = your own label
+#   enabled : false = keep the entry but skip it
+#   note    : freeform
+#
+# Everything in `filters` is a regex alternative list (no outer parentheses) or a
+# scalar. Leave a term empty to disable that gate.
+
+filters:
+  timezone: ""                      # IANA name, e.g. America/New_York; empty = system local
+  min_comp: 0                       # total-comp floor; 0 = no floor. Midpoint of a posted range must clear it
+  leadership_only: false            # true = title must carry a seniority token (head, director, manager, ...)
+  seniority_terms: "head\\s+of|head|vp|svp|evp|vice\\s+president|chief|director|dir\\.?|manager|mgr\\.?|general\\s+manager|gm"
+  function_terms: "widget\\s+design|widget\\s+engineering|gadget\\s+design"          # EDIT: your function's vocabulary (placeholders)
+  priority_function_terms: "widget\\s+design|widget\\s+engineering"                    # EDIT: the subset that is Lane A
+  ic_override_terms: "staff|principal|individual\\s+contributor"
+  home_region_terms: "springfield|\\bxy\\b"                                            # EDIT: your city/state (placeholder); empty = none
+  home_region_label: "Springfield/XY"
+  lane_labels:
+    A: "Widget design"
+    B: "Gadget design"
+  user_agent: "JobScoutOS-ATS-Poller/1.0 (personal job search)"
+
+boards:
+  # These three are real public boards, here only as syntax examples. Replace them
+  # with the employers from your profile's ATS URL table.
+  - {company: Stripe,      ats: greenhouse, slug: stripe,      tier: 1}
+  - {company: Notion,      ats: ashby,      slug: notion,      tier: 2}
+  - {company: Figma,       ats: lever,      slug: figma,       tier: 2, enabled: false, note: "example of a parked entry"}
