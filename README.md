@@ -23,7 +23,7 @@ JobScoutOS is a set of agent personas and skills that run inside [Claude Code](h
 |---|---|---|
 | **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
 | **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
-| **Mark** | The market analyst. Tracks funding, leadership moves, new field teams, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
+| **Mark** | The market analyst. Tracks funding, leadership moves, new team build-outs, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
 
 **Skills are the commands you run.** Each is a short Markdown prompt in `.claude/commands/`. You type `/jobs-daily` or `/mock-interview` in Claude Code and the right agent picks it up. There are 25. Section 3 lists them by when you would use them.
 
@@ -45,12 +45,12 @@ JobScoutOS is a set of agent personas and skills that run inside [Claude Code](h
 - Python 3.11 or newer, only for the scheduler and helper scripts
 - Optional: [Obsidian](https://obsidian.md), to read the vault comfortably
 - Optional: Gmail connected as an MCP connector in claude.ai, for inbox triage
-- Optional: macOS, if you want the daily routine to run on a schedule (it uses launchd)
+- Optional: macOS, if you want the daily routine to run on a schedule (it uses launchd). Drafts are copied to the clipboard with `pbcopy`, which is also macOS; elsewhere they still land in the vault.
 
 ### Install
 
 ```bash
-git clone <this repo> JobScoutOS
+git clone https://github.com/matthewprice/JobScoutOS.git
 cd JobScoutOS
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -88,7 +88,7 @@ Scout reads your target companies' careers pages, scores what it finds, and writ
 
 ### Optional: connect Gmail
 
-Connect Gmail as an MCP connector in claude.ai. Coach can then triage recruiter email, spot interview invitations, and detect rejections. It reads only. Section 5 covers the code-level guarantee.
+Connect Gmail as an MCP connector in claude.ai. Coach can then triage recruiter email, spot interview invitations, and detect rejections. It is instructed to read only; Section 5 explains what that rests on.
 
 ### Optional: put it on a schedule (macOS)
 
@@ -159,7 +159,7 @@ The rule behind this is in Section 4.2. Short version: find a human first, apply
 
 ### The rest
 
-`/jobs-scout`, `/mark-pulse`, `/mark-weekly`, `/jobs-email`, `/email-watch`, and `/jobs-digest` are the pieces `/jobs-daily` is made of. Run them alone when you want one piece.
+`/mark-pulse`, `/jobs-scout`, `/jobs-email`, and `/jobs-digest` are the pieces `/jobs-daily` is made of. Run them alone when you want one piece. `/mark-weekly` is the weekly brief and Strategy pass, `/email-watch` is a read-only inbox briefing, and `/jobs-priority-watch` is the narrow weekday scan the scheduler runs.
 
 ### Reading the vault
 
@@ -195,7 +195,7 @@ Everyone on the hiring side reads AI-written messages all day and is pattern-mat
 
 - **Low volume by design.** At most 3 new people a day, 10 a week. At most 2 follow-ups per thread, then park it for 30 days. Never two similar messages to two people at one company.
 - **The two-fact rule.** Every outbound message carries one fact that took real work to find, with the source cited so you can read it first, and one thing only you could say. Missing either, it does not go. Silence beats generic.
-- **You send everything.** Drafts land on your clipboard with a "before you send" checklist and slots you have to fill in your own words. The agents never send, never schedule, never create a Gmail draft unless you turn that on.
+- **You send everything.** Drafts land on your clipboard with a "before you send" checklist and slots you have to fill in your own words. The agents never send, never schedule, never create a Gmail draft.
 - **The voice gate.** Nothing drafted for you may read as AI-written. No em dashes, no "I hope this finds you well," no perfectly balanced three-part sentences, no flattery openers. `/voice-check` enforces it.
 
 ### 4.4 Silence is data
@@ -240,11 +240,7 @@ CLAUDE.md            project instructions the agents read every run
 
 ### Email safety
 
-The codebase never calls Gmail's send API. The only Gmail write it can make is a draft, and that is off unless you enable it. To block drafts too, put `JOBSCOUTOS_GMAIL_DRAFTS_DISABLED=1` in `.env`. A test enforces the policy:
-
-```bash
-make check-email-policy
-```
+No code in this repository calls a send or draft API. Gmail is reached only through the claude.ai MCP connector, and that connector does expose send and draft tools. What keeps the agents read-only is doctrine: `CLAUDE.md`, the agent files, and the playbook all forbid sending and drafting, and every draft goes to the clipboard and the vault instead. Read those instructions before you trust the system with your inbox; there is no separate technical lock.
 
 ### Privacy
 
@@ -252,7 +248,7 @@ Your profile, rubric, wins, stories, voice notes, and vault contents are gitigno
 
 ### Retention
 
-Daily digests, run summaries, and daily briefs keep 30 days. Weekly briefs keep 90. A weekly launchd job prunes the rest. Git is the permanent archive. Anything worth keeping lives in `Strategy.md`, `Tracking/`, or `Companies/`, never in an old digest.
+Daily digests, run summaries, and daily briefs keep 30 days. Weekly briefs keep 90. A weekly launchd job prunes the rest. The vault is gitignored here, so if you want a permanent archive, back it up to a private repository of your own. Anything worth keeping lives in `Strategy.md`, `Tracking/`, or `Companies/`, never in an old digest.
 
 ### Manual runs and logs
 
@@ -266,7 +262,3 @@ tail -f logs/launchd-runs.log                            # watch runs
 ### Writing your own skill
 
 Open any file in `.claude/commands/`. The first line names the agent. The rest is the task. Copy one, change the task, save it under a new name, and it is a command.
-
-### The old Python pipeline
-
-`run_jobs.py`, `run_mark.py`, and `agents/` are a deprecated predecessor that needed API keys. They are kept for reference and are not used by anything above.
