@@ -1,106 +1,272 @@
 # JobScoutOS
 
-An agentic job search that runs on [Claude Code](https://claude.com/claude-code). Three agents work for one candidate: a **recruiter** who exercises judgment and gets you ready for every room, a **crawler** who scans employers' own careers pages, and a **market analyst** who reads the signals that precede job postings. Everything they produce lands in an [Obsidian](https://obsidian.md) vault you own.
+This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone runs out of hours by week three. Agents do not. JobScoutOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
 
-It was built and used for one real search, then scrubbed and generalized. It works for any career: the agents learn who you are from an interview, not from a hardcoded profile.
+This manual covers four things:
 
-## What makes it different
+1. [What it is](#1-what-it-is)
+2. [Getting up and running](#2-getting-up-and-running)
+3. [Using it](#3-using-it)
+4. [The methodology: how agentic job search works here](#4-the-methodology)
 
-- **It behaves like a recruiter, not a job board.** Every run ends with a candid "Recruiter's read": what the pipeline means, what pattern is forming, what you are avoiding. Losses get a postmortem and feed an objection log.
-- **Warm-path-first.** An application without a human attached is the last resort. The agents name who you know or can reach before anything is queued, and sequence outreach before the application.
-- **Anti-AI-spam by design.** Low outreach volume, a two-fact rule for every message, and a hard gate that nothing drafted in your voice may read as AI-written. The agents never send anything; drafts go to your clipboard and you send them from your own client.
-- **No API keys.** Reasoning is your Claude Code subscription. Email is the Gmail MCP connector (read only). Scheduling is macOS launchd. The vault is a folder on disk.
-- **Private by default.** Your profile, rubric, wins, stories, and vault are gitignored. Nothing about you is in this repo, and nothing the agents write goes anywhere you did not put it.
+Plus a short [reference](#5-reference) at the end.
 
-## Requirements
+---
 
-- macOS (scheduling uses launchd; the skills themselves run anywhere Claude Code runs)
-- [Claude Code](https://claude.com/claude-code) installed and logged in (`claude auth login`)
-- Python 3.11+ with PyYAML (`pip install -r requirements.txt`) for the scheduler and helper scripts
-- [Obsidian](https://obsidian.md) to read the vault (optional; it is plain Markdown)
-- Gmail connected as an MCP connector in claude.ai, if you want the inbox triage
+## 1. What it is
 
-## Quick start
+JobScoutOS is a set of agent personas and skills that run inside [Claude Code](https://claude.com/claude-code) and work for you to identify career opportunities based on your criteria. They watch the market, find roles, keep your pipeline up to date and honest, and get you ready for every interview. They write everything to a folder of Markdown notes, which you can open in [Obsidian](https://obsidian.md) or any text editor.
+
+**Three agents, each with one job.**
+
+| Agent | What it does | What it can touch |
+|---|---|---|
+| **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
+| **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
+| **Mark** | The market analyst. Tracks funding, leadership moves, new field teams, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
+
+**Skills are the commands you run.** Each is a short Markdown prompt in `.claude/commands/`. You type `/jobs-daily` or `/mock-interview` in Claude Code and the right agent picks it up. There are 25. Section 3 lists them by when you would use them.
+
+**Your config is what they read first.** `config/profile.md` says who you are and what you want. `config/scoring_rubric.md` says how to score a role. `config/recruiter_playbook.md` says how the agents behave. Section 4 explains that playbook in plain English.
+
+**The vault is where everything lands.** `vault/Dashboard.md` is the daily read. `vault/Strategy.md` is the weekly one. Every company gets a folder under `vault/Companies/` with a profile and one note per role. Digests, market briefs, outreach drafts, and interview prep all have their own folders.
+
+**What it never does.** It never sends an email or a message. Drafts go to your clipboard and the vault, and you send them from your own client. It never mass-applies. It never sits in the interview.
+
+**What it needs.** A Claude Code subscription. No API keys. Python is only used by the optional scheduler.
+
+---
+
+## 2. Getting up and running
+
+### Requirements
+
+- [Claude Code](https://claude.com/claude-code), installed and logged in (`claude auth login`)
+- Python 3.11 or newer, only for the scheduler and helper scripts
+- Optional: [Obsidian](https://obsidian.md), to read the vault comfortably
+- Optional: Gmail connected as an MCP connector in claude.ai, for inbox triage
+- Optional: macOS, if you want the daily routine to run on a schedule (it uses launchd)
+
+### Install
 
 ```bash
-git clone <this repo> JobScoutOS && cd JobScoutOS
-python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+git clone <this repo> JobScoutOS
+cd JobScoutOS
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 claude
 ```
 
-Then, inside Claude Code:
+### First run: teach it who you are
+
+Inside Claude Code:
 
 ```
-/onboard          # 15-minute interview → config/profile.md, scoring_rubric.md, wins.md, voice.md
-/jobs-scout       # first scan of your target companies' careers pages
-/jobs-daily       # the everyday routine: market pulse + scout → email → digest → Recruiter's read
-/whats-next       # "what should we do next?" — the highest-leverage actions, done together
+/onboard
 ```
 
-Open `vault/` in Obsidian. `Dashboard.md` is the daily read, `Strategy.md` the weekly one.
+This is a 15-minute conversation. It asks about your current role, what you want next, your salary floor, where you will and will not work, companies to avoid, the exact job titles recruiters use for your target, and two or three real wins with numbers. Any career works. It does not assume you are technical.
 
-## How it is put together
+When it finishes you have:
+
+| File | What it holds |
+|---|---|
+| `config/profile.md` | Who you are, targets, comp floor, location rules, exclusions, target companies with their careers-page URLs |
+| `config/scoring_rubric.md` | How to score a role from 1 to 10, weighted by what you said matters |
+| `config/wins.md` | Your wins in situation-task-action-result form, used in prep and cover letters |
+| `config/voice.md` | How you write, so drafts sound like you |
+
+All four are gitignored. They never leave your machine.
+
+### Second run: the first scan
 
 ```
-.claude/agents/      coach.md · scout.md · mark.md     ← the personas (Claude Code subagents)
-.claude/commands/    25 skills                         ← thin task prompts; each names its agent
-config/              templates + the recruiter playbook ← your private copies are gitignored
-scripts/             launchd scheduler, guards, ATS poller, retention pruner
-vault/               the Obsidian vault (skeleton only in git)
+/jobs-scout
+```
+
+Scout reads your target companies' careers pages, scores what it finds, and writes an opportunity note for anything that clears your bar. Then open `vault/` in Obsidian and read `Dashboard.md`.
+
+### Optional: connect Gmail
+
+Connect Gmail as an MCP connector in claude.ai. Coach can then triage recruiter email, spot interview invitations, and detect rejections. It reads only. Section 5 covers the code-level guarantee.
+
+### Optional: put it on a schedule (macOS)
+
+```bash
+bash scripts/JobScoutOS_install_launchd.sh
+```
+
+One LaunchAgent ticks every 30 minutes. When a window in `config/scheduler.yaml` comes due it runs `/jobs-daily` (every day), `/mark-weekly` (once a week), and a narrow weekday watch on your priority function. Your Mac has to be awake. A missed run catches up on the next tick. Runs are logged to `logs/` and mirrored to `vault/Automation/`.
+
+Check it is working:
+
+```bash
+python3 scripts/scheduler_tick.py --dry-run
+bash scripts/verify_local_automation.sh
+```
+
+---
+
+## 3. Using it
+
+Every skill run ends with a **Recruiter's read**: two to five sentences of candid advice about what today's state means and what you are avoiding. It is never a recap. Read it.
+
+### Every day
+
+```
+/jobs-daily     Market pulse and scout run in parallel, then email triage, then the digest.
+/checkin        Tick boxes on the Dashboard, tell it what happened, it ages every thread.
+/whats-next     "What should we do next?" It sweeps the pipeline and offers the 3 to 5 best moves.
+```
+
+If you run one thing a day, run `/whats-next`. It is a conversation: pick a move, do it together, the vault updates, the list re-ranks.
+
+### Before you apply
+
+```
+/warm-path <Company>       Who do you know, or can reach, there? Returns a verdict and dates.
+/network-outreach <Co>     Finds 2 or 3 peer-level people and drafts a research-backed note.
+/draft-message             A reply, nudge, thank-you, or cold note. Copies to clipboard.
+/voice-check               Scans any draft for AI tells. PASS, REWRITE, or DO NOT SEND.
+```
+
+The rule behind this is in Section 4.2. Short version: find a human first, apply two or three days later.
+
+### Researching a company
+
+```
+/jobs-research <Company>   Business, funding, leadership, product, how they sell, open roles, an angle.
+/mark-profiler <Company>   A deeper evaluation for a real decision. Scored, with a verdict.
+/title-audit               Reads live postings and tells you what your job is called right now.
+```
+
+### When interviews start
+
+```
+/jobs-prep <Company> <Role> <Stage>    Full prep brief: company, round, and every person in the room.
+/mock-interview <Company> <Round>      Plays the interviewer in character. Scores each answer.
+/day-of-card <Company> <Round>         One page to have open: beats, lead stories, questions, traps.
+/jobs-cover <Company> <Role>           A cover letter built from research, in your voice.
+/story add | find | update             Your career story library. Prep and covers draw from it.
+```
+
+### After a loss
+
+```
+/postmortem <Company>      Classifies the objection, logs it in Strategy.md, names the fix.
+/profile                   Deepens your wins and voice files over time.
+```
+
+### The rest
+
+`/jobs-scout`, `/mark-pulse`, `/mark-weekly`, `/jobs-email`, `/email-watch`, and `/jobs-digest` are the pieces `/jobs-daily` is made of. Run them alone when you want one piece.
+
+### Reading the vault
+
+| Note | When to read it |
+|---|---|
+| `vault/Dashboard.md` | Every morning. Funnel pulse, plays for today, live threads, aging applications. |
+| `vault/Strategy.md` | Weekly. Positioning, the objection log, funnel history, proof assets, deadline math. |
+| `vault/Daily Digests/` | The morning briefing for each day. |
+| `vault/Companies/<Company>/` | One profile per company plus one note per role, with contacts and a timeline. |
+| `vault/Tracking/` | Contacts, the email follow-up queue, the company index. |
+| `vault/Outreach Drafts/` | Every draft the coach has written. Nothing here has been sent. |
+| `vault/Market Intel/` | Weekly briefs, the market pulse, and the handoff file Mark writes for Scout. |
+
+---
+
+## 4. The methodology
+
+This is the operating doctrine the agents follow, written for a person. The source is `config/recruiter_playbook.md`. Everything here came out of running one real search for five months and studying what worked.
+
+### 4.1 Act like a recruiter, not a clerk
+
+A job board shows you listings. A recruiter tells you what your pipeline means, which thread is dying, which play you are avoiding, and when a pattern has formed. That is the coach's job. The Recruiter's read at the end of every run is the mechanism. If it is uncomfortable, it is working.
+
+### 4.2 Attach a human before you apply
+
+An application with no human attached is the last resort, not the default. Before anything is queued, the agents walk a ladder: people you already know at the company, former colleagues who moved there, the hiring manager and their boss by name, a named recruiter. Outreach goes first. The application follows 48 to 72 hours later, so a mention inside the company lands before your resume hits the pile.
+
+When the ladder comes up empty, the application is logged as cold. The system tracks the ratio and aims for 70 percent warm. In the search this was built on, every single rejection was a cold application. Not most. All.
+
+### 4.3 Never sound like a machine
+
+Everyone on the hiring side reads AI-written messages all day and is pattern-matching for them. One detected template can quietly end a conversation, and the people in your field talk to each other. So:
+
+- **Low volume by design.** At most 3 new people a day, 10 a week. At most 2 follow-ups per thread, then park it for 30 days. Never two similar messages to two people at one company.
+- **The two-fact rule.** Every outbound message carries one fact that took real work to find, with the source cited so you can read it first, and one thing only you could say. Missing either, it does not go. Silence beats generic.
+- **You send everything.** Drafts land on your clipboard with a "before you send" checklist and slots you have to fill in your own words. The agents never send, never schedule, never create a Gmail draft unless you turn that on.
+- **The voice gate.** Nothing drafted for you may read as AI-written. No em dashes, no "I hope this finds you well," no perfectly balanced three-part sentences, no flattery openers. `/voice-check` enforces it.
+
+### 4.4 Silence is data
+
+Every thread is aged against a table of norms. An application at a small company with no reply after 14 days is presumed dead. After a recruiter screen, 7 days of silence means you are the backup candidate, so open a second thread at a comparable company now. A warm contact who has not answered in a week is busy, not hostile, so one bump with a new angle, then park. Presumed-dead threads stop getting your energy. If one revives, that is a bonus, not a plan.
+
+### 4.5 Every loss becomes intelligence
+
+After any rejection, withdrawal, or 30-day ghost, `/postmortem` classifies the objection, both what they said and what they probably meant: domain-proof gap, level mismatch, location, comp, slate, culture, unknown. It goes into the objection log in `Strategy.md`. Three of the same objection is a positioning problem, not bad luck, and the fix becomes a strategy action. Nine postmortems in the original search surfaced the pattern that changed its whole back half.
+
+### 4.6 Check what your job is called now
+
+Job titles move, and postings are the trailing indicator. Mark watches for renames at your target companies. `/title-audit` reads their live postings, tallies the vocabulary, and hands you the exact terms to put in your profile and saved searches. In the original search the target role had been renamed at the companies that mattered. The winning listing arrived three weeks after the search terms changed, under the new name. The crawler never found it. The rename did.
+
+### 4.7 Spend AI on depth, not volume
+
+Mass-applying stopped working for everyone at about the same time, because everyone can do it now. The edge moved to the rooms. AI makes serious preparation cheap: a research brief per round, a profile on every interviewer, mock interviews, cover letters that start from research, a story library you know cold. That is where the time saved by the agents should go.
+
+### 4.8 Run the pipeline like a funnel
+
+Stages are Applied, Screen, Hiring-manager round, Final, Offer, tracked separately for warm and cold. The weekly Strategy pass does the math out loud. If cold applications are not converting to screens, more cold applications are not the answer. If screens are not converting to hiring-manager rounds, the leak is your narrative. Two more rules from the same section: every serious opportunity gets multi-threaded (recruiter, hiring manager, their boss, a peer) so one silence cannot kill it, and when any process reaches the hiring-manager stage, accelerate the two best comparable ones so offers land in the same ten days. Never bluff an offer that does not exist.
+
+### 4.9 Work backward from a date
+
+Set a deadline for having an offer in hand. Finals two weeks before that, hiring-manager rounds a month before, screens six weeks before, warm plays now. Every weekly read says in plain terms whether the current pace hits the date and what would change it.
+
+---
+
+## 5. Reference
+
+### Layout
+
+```
+.claude/agents/      coach.md · scout.md · mark.md         the three agents
+.claude/commands/    25 skills                             each names its agent in the first line
+config/              profile, rubric, wins, voice, targets  your copies are gitignored; templates ship
+config/recruiter_playbook.md                               the doctrine in Section 4, in full
+scripts/             scheduler, guards, ATS poller, pruner
+vault/               the Obsidian vault
 CLAUDE.md            project instructions the agents read every run
 ```
 
-| Agent | Job | Tools |
-|-------|-----|-------|
-| `coach` | Pipeline judgment, prep, mock interviews, drafting, voice checks, postmortems, inbox triage, the digest | All tools incl. Gmail (read only) |
-| `scout` | ATS-direct scanning, scoring, opportunity notes, the weekday watch | Web + vault |
-| `mark` | Funding, leadership moves, renames, weekly briefs, company deep-dives | Web + vault |
+### Email safety
 
-The doctrine they share is `config/recruiter_playbook.md`: the Recruiter's read, the warm-path gate, the authenticity rules, silence norms, funnel math, multi-threading, offer orchestration, the objection log, deadline math. Read it once; it is the reason the system works.
-
-### Skills
-
-| Skill | What it does |
-|-------|--------------|
-| `/onboard` | First run. Interviews you and generates your private config. Career-neutral. |
-| `/jobs-daily` | The everyday driver: pulse + scout in parallel, then email, then digest, then one Recruiter's read |
-| `/jobs-scout` · `/jobs-priority-watch` | Scan employers' own careers pages and ATS boards; the watch is a narrow weekday check on your priority function |
-| `/jobs-email` · `/email-watch` | Gmail triage, rejection sweep, interview detection with auto-prep; flags replies due, drafts only on yes |
-| `/jobs-digest` | The morning briefing, a scoped Dashboard refresh, a warm-path coverage check |
-| `/mark-pulse` · `/mark-weekly` · `/mark-profiler` · `/jobs-research` | Market signals, the weekly brief and Strategy pass, company deep-dives |
-| `/whats-next` · `/checkin` | The two conversational drivers: choose the next move, or sync the pipeline |
-| `/warm-path` · `/network-outreach` · `/draft-message` · `/voice-check` | Attach a human, find peers, draft in your voice, gate every draft for AI tells |
-| `/jobs-prep` · `/mock-interview` · `/day-of-card` · `/story` | Interview prep grounded in your story library, a simulated round, the one page for the room |
-| `/jobs-cover` · `/postmortem` · `/title-audit` · `/profile` | Cover letters, loss analysis, search-vocabulary audits, progressive profiling |
-
-Every skill is a short Markdown file in `.claude/commands/`. Read one to see the pattern, then write your own.
-
-## Scheduling
+The codebase never calls Gmail's send API. The only Gmail write it can make is a draft, and that is off unless you enable it. To block drafts too, put `JOBSCOUTOS_GMAIL_DRAFTS_DISABLED=1` in `.env`. A test enforces the policy:
 
 ```bash
-bash scripts/JobScoutOS_install_launchd.sh          # one launchd job; ticks every 30 min while the Mac is awake
-JOBS_DAILY_HOUR=7 MARK_WEEKLY_WEEKDAY=1 JOBSCOUTOS_TZ=America/New_York bash scripts/JobScoutOS_install_launchd.sh
-python3 scripts/scheduler_tick.py --dry-run          # what would run now
-bash scripts/JobScoutOS_install_helpers.sh           # optional: ATS poller, retention pruner, pointer notes
+make check-email-policy
 ```
 
-The tick runs `/jobs-daily` once a day, `/mark-weekly` once a week, and the priority watch on weekdays, all through `claude -p`. Times and timezone live in `config/scheduler.yaml`. Details and failure triage: `vault/Automation/JobScoutOS — Local Runbook.md`.
+### Privacy
 
-The optional **ATS poller** (`scripts/jobscoutos_ats_poll.py`) is deterministic: it hits Greenhouse, Ashby, and Lever JSON APIs for the boards in `config/ats_boards.yaml`, applies your title, location, and comp filters, and appends only genuinely new reqs to `vault/Market Intel/ATS Inbox.md` for the digest to score. Copy `config/ats_boards.example.yaml`, edit the `filters:` block, run `--seed` once, then `--dry-run`.
+Your profile, rubric, wins, stories, voice notes, and vault contents are gitignored. Nothing about you ships in this repo, and nothing the agents write goes anywhere you did not put it. If a company you are applying to has guidance on AI use in applications, follow it: you draft first, the coach refines.
 
-## Privacy and safety
+### Retention
 
-- `config/profile.md`, `scoring_rubric.md`, `wins.md`, `voice.md`, `targets.md`, `stories.md`, `ats_boards.yaml`, and all vault content are gitignored. If you want your vault backed up, do it in a private repository and remove those rules yourself.
-- Agents never commit, never push, never send email, never create Gmail drafts. There is no code path to a send API.
-- Gmail access is the claude.ai MCP connector, so credentials never touch this repo.
+Daily digests, run summaries, and daily briefs keep 30 days. Weekly briefs keep 90. A weekly launchd job prunes the rest. Git is the permanent archive. Anything worth keeping lives in `Strategy.md`, `Tracking/`, or `Companies/`, never in an old digest.
 
-## Known limits
+### Manual runs and logs
 
-- The ATS poller's location classifier speaks US geography (remote-US, hub cities, a home region). The vocabulary is a handful of regexes at the top of the script; edit them for another country.
-- launchd is macOS only. On Linux, point cron at `scripts/scheduler_tick.py` instead.
-- The Gmail skills assume the Gmail MCP connector. Without it, `/jobs-email` and `/email-watch` are no-ops and everything else still works.
-- Skills are prompts, not code. They are only as good as the profile `/onboard` writes; spend the 15 minutes.
+```bash
+python3 scripts/scheduler_tick.py --dry-run             # what would run right now
+bash scripts/JobScoutOS_run_skill.sh jobs-daily jobs-daily   # run one skill the way the scheduler does
+bash scripts/JobScoutOS_check_local_runner.sh          # is Claude Code reachable from launchd?
+tail -f logs/launchd-runs.log                            # watch runs
+```
 
-## License
+### Writing your own skill
 
-MIT. See `LICENSE`.
+Open any file in `.claude/commands/`. The first line names the agent. The rest is the task. Copy one, change the task, save it under a new name, and it is a command.
+
+### The old Python pipeline
+
+`run_jobs.py`, `run_mark.py`, and `agents/` are a deprecated predecessor that needed API keys. They are kept for reference and are not used by anything above.
