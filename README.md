@@ -4,6 +4,14 @@
 
 <h1 align="center">JobFinderOS</h1>
 
+<p align="center">
+  <img src="assets/coach.png" width="114" alt="Coach: Clawd in a ball cap holding a clipboard">&nbsp;&nbsp;&nbsp;
+  <img src="assets/scout.png" width="114" alt="Scout: Clawd in a bucket hat with binoculars">&nbsp;&nbsp;&nbsp;
+  <img src="assets/mark.png" width="114" alt="Mark: Clawd in a green eyeshade reading ticker tape">
+  <br>
+  <sub><b>Coach</b>, the recruiter &nbsp;·&nbsp; <b>Scout</b>, the crawler &nbsp;·&nbsp; <b>Mark</b>, the market analyst</sub>
+</p>
+
 This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone runs out of hours by week three. Agents do not. JobFinderOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
 
 This manual covers four things:
@@ -13,7 +21,7 @@ This manual covers four things:
 3. [Using it](#3-using-it)
 4. [The methodology: how agentic job search works here](#4-the-methodology)
 
-Plus a short [reference](#5-reference) at the end.
+Plus a short [reference](#5-reference) and a note on [contributing](#contributing) at the end.
 
 ---
 
@@ -25,9 +33,14 @@ JobFinderOS is a set of agent personas and skills that run inside [Claude Code](
 
 | | Agent | What it does | What it can touch |
 |---|---|---|---|
-| <img src="assets/coach.svg" width="72" alt=""> | **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
-| <img src="assets/scout.svg" width="72" alt=""> | **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
-| <img src="assets/mark.svg" width="72" alt=""> | **Mark** | The market analyst. Tracks funding, leadership moves, new team build-outs, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
+| <img src="assets/coach.png" width="72" alt=""> | **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
+| <img src="assets/scout.png" width="72" alt=""> | **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
+| <img src="assets/mark.png" width="72" alt=""> | **Mark** | The market analyst. Tracks funding, leadership moves, new team build-outs, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
+
+> [!IMPORTANT]
+> **🔒 Privacy by Design**
+>
+> A job search is sensitive, so nothing about you is meant to leave your machine. Your profile, scoring rubric, wins, stories, voice notes, target list, and ATS board list are all `.gitignore`d. So is the whole vault, apart from a few empty skeleton files (the Dashboard, Strategy, and Tracking templates) that ship blank; once they fill in, leave them uncommitted. The agents never commit, push, send, or upload anything. The only place your data goes is into the Claude Code session you start yourself, and the only remote it ever reaches is one you add by hand.
 
 **Skills are the commands you run.** Each is a short Markdown prompt in `.claude/commands/`. You type `/jobs-daily` or `/mock-interview` in Claude Code and the right agent picks it up. There are 25. Section 3 lists them by when you would use them.
 
@@ -43,15 +56,19 @@ JobFinderOS is a set of agent personas and skills that run inside [Claude Code](
 
 ## 2. Getting up and running
 
-### Requirements
+Four steps. The first two happen in your terminal, the last two inside Claude Code.
 
-- [Claude Code](https://claude.com/claude-code), installed and logged in (`claude auth login`)
-- Python 3.11 or newer, only for the scheduler and helper scripts
-- Optional: [Obsidian](https://obsidian.md), to read the vault comfortably
-- Optional: Gmail connected as an MCP connector in claude.ai, for inbox triage
-- Optional: macOS, if you want the daily routine to run on a schedule (it uses launchd). Drafts are copied to the clipboard with `pbcopy`, which is also macOS; elsewhere they still land in the vault.
+### Step 1. Get Claude Code
 
-### Install
+You need [Claude Code](https://claude.com/claude-code) installed and logged in with a subscription. No API keys.
+
+```bash
+claude auth login
+```
+
+### Step 2. Clone and install
+
+Paste this block as one piece:
 
 ```bash
 git clone https://github.com/matthewprice/JobFinderOS.git
@@ -61,7 +78,9 @@ pip install -r requirements.txt
 claude
 ```
 
-### First run: teach it who you are
+The two Python lines need Python 3.11 or newer. They only serve the optional scheduler and helper scripts, so if you never plan to schedule anything you can skip them and go straight to `claude`.
+
+### Step 3. Teach it who you are
 
 Inside Claude Code:
 
@@ -71,7 +90,7 @@ Inside Claude Code:
 
 This is a 15-minute conversation. It asks about your current role, what you want next, your salary floor, where you will and will not work, companies to avoid, the exact job titles recruiters use for your target, and two or three real wins with numbers. Any career works. It does not assume you are technical.
 
-When it finishes you have:
+When it finishes you have four private files, all gitignored:
 
 | File | What it holds |
 |---|---|
@@ -80,34 +99,34 @@ When it finishes you have:
 | `config/wins.md` | Your wins in situation-task-action-result form, used in prep and cover letters |
 | `config/voice.md` | How you write, so drafts sound like you |
 
-All four are gitignored. They never leave your machine.
-
-### Second run: the first scan
+### Step 4. Run the first scan
 
 ```
 /jobs-scout
 ```
 
-Scout reads your target companies' careers pages, scores what it finds, and writes an opportunity note for anything that clears your bar. Then open `vault/` in Obsidian and read `Dashboard.md`.
+Scout reads your target companies' careers pages, scores what it finds, and writes an opportunity note for anything that clears your bar. Open `vault/` and read `Dashboard.md`. You are running.
 
-### Optional: connect Gmail
+### Optional extras
 
-Connect Gmail as an MCP connector in claude.ai. Coach can then triage recruiter email, spot interview invitations, and detect rejections. It is instructed to read only; Section 5 explains what that rests on.
+Each of these is independent. Add them when you want them.
 
-### Optional: put it on a schedule (macOS)
+- **Obsidian.** Open `vault/` as a vault in [Obsidian](https://obsidian.md) to read the notes with working links. Any text editor works too.
+- **Gmail.** Connect Gmail as an MCP connector in claude.ai. Coach can then triage recruiter email, spot interview invitations, and detect rejections. It is instructed to read only; Section 5 explains what that rests on.
+- **A schedule (macOS only).** Drafts are copied to the clipboard with `pbcopy` and the scheduler uses launchd, so this part is Mac-specific. Elsewhere, drafts still land in the vault and you run the skills by hand.
 
-```bash
-bash scripts/JobFinderOS_install_launchd.sh
-```
+  ```bash
+  bash scripts/JobFinderOS_install_launchd.sh
+  ```
 
-One LaunchAgent ticks every 30 minutes. When a window in `config/scheduler.yaml` comes due it runs `/jobs-daily` (every day), `/mark-weekly` (once a week), and a narrow weekday watch on your priority function. Your Mac has to be awake. A missed run catches up on the next tick. Runs are logged to `logs/` and mirrored to `vault/Automation/`.
+  One LaunchAgent ticks every 30 minutes. When a window in `config/scheduler.yaml` comes due it runs `/jobs-daily` (every day), `/mark-weekly` (once a week), and a narrow weekday watch on your priority function. Your Mac has to be awake. A missed run catches up on the next tick. Runs are logged to `logs/` and mirrored to `vault/Automation/`.
 
-Check it is working:
+  Check it is working:
 
-```bash
-python3 scripts/scheduler_tick.py --dry-run
-bash scripts/verify_local_automation.sh
-```
+  ```bash
+  python3 scripts/scheduler_tick.py --dry-run
+  bash scripts/verify_local_automation.sh
+  ```
 
 ---
 
@@ -116,6 +135,8 @@ bash scripts/verify_local_automation.sh
 Every skill run ends with a **Recruiter's read**: two to five sentences of candid advice about what today's state means and what you are avoiding. It is never a recap. Read it.
 
 ### Every day
+
+<img src="assets/coach.png" width="40" alt="Coach"> **Coach** runs these. `/jobs-daily` also sends Scout and Mark out first, then hands what they found to Coach.
 
 ```
 /jobs-daily     Market pulse and scout run in parallel, then email triage, then the digest.
@@ -126,6 +147,8 @@ Every skill run ends with a **Recruiter's read**: two to five sentences of candi
 If you run one thing a day, run `/whats-next`. It is a conversation: pick a move, do it together, the vault updates, the list re-ranks.
 
 ### Before you apply
+
+<img src="assets/coach.png" width="40" alt="Coach"> **Coach** runs these.
 
 ```
 /warm-path <Company>       Who do you know, or can reach, there? Returns a verdict and dates.
@@ -138,6 +161,8 @@ The rule behind this is in Section 4.2. Short version: find a human first, apply
 
 ### Researching a company
 
+<img src="assets/mark.png" width="40" alt="Mark"> **Mark** runs these.
+
 ```
 /jobs-research <Company>   Business, funding, leadership, product, how they sell, open roles, an angle.
 /mark-profiler <Company>   A deeper evaluation for a real decision. Scored, with a verdict.
@@ -145,6 +170,8 @@ The rule behind this is in Section 4.2. Short version: find a human first, apply
 ```
 
 ### When interviews start
+
+<img src="assets/coach.png" width="40" alt="Coach"> **Coach** runs these.
 
 ```
 /jobs-prep <Company> <Role> <Stage>    Full prep brief: company, round, and every person in the room.
@@ -155,6 +182,8 @@ The rule behind this is in Section 4.2. Short version: find a human first, apply
 ```
 
 ### After a loss
+
+<img src="assets/coach.png" width="40" alt="Coach"> **Coach** runs these.
 
 ```
 /postmortem <Company>      Classifies the objection, logs it in Strategy.md, names the fix.
@@ -267,6 +296,23 @@ tail -f logs/launchd-runs.log                            # watch runs
 
 The pixel character is Clawd, the Claude Code mascot. He belongs to Anthropic and is redrawn here in work clothes, with affection and no affiliation.
 
+The three agents are the same character in different gear. Coach wears the ball cap and carries the clipboard. Scout has the bucket hat and binoculars. Mark wears the green eyeshade and reads the ticker tape. The drawings live in `assets/` as SVG sources; the three agent icons also ship as PNGs because GitHub collapses SVGs inside Markdown tables.
+
 ### Writing your own skill
 
 Open any file in `.claude/commands/`. The first line names the agent. The rest is the task. Copy one, change the task, save it under a new name, and it is a command.
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. Bug reports, wording fixes, and "this claim does not match the code" are all useful.
+
+The most valuable contribution is a new skill. Each file in `.claude/commands/` is a short Markdown prompt: a `description` line in the frontmatter, an **Agent** line saying which of Coach, Scout, or Mark runs it, and a Task section. If you have built one that helped your own search, open a pull request with it. A few things to keep in mind:
+
+- **Keep it career-neutral.** Skills read `config/profile.md` for everything about the candidate. Nothing about a specific person, industry, or company belongs in a skill.
+- **Follow the playbook.** Warm path first, low outreach volume, a human in the loop on every message, and a Recruiter's read at the end. `config/recruiter_playbook.md` is the doctrine; a skill that fights it will not be merged.
+- **Never send.** Drafts go to the clipboard and the vault. No skill may send email, create Gmail drafts, or post anywhere on the candidate's behalf.
+- **Scrub before you push.** Check the diff for your own profile, wins, contacts, or vault notes. The `.gitignore` covers the usual paths, but a copied example can slip through.
+
+Say in the pull request what the skill is for, which agent runs it, and what it wrote to the vault when you ran it. MIT licensed, so contributions are too.
