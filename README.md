@@ -6,7 +6,7 @@
 
 <p align="center"><b>Find your dream job with Claude Code agents. No coffee breaks, no doomscrolling, no sleep till you're hired!</b></p>
 
-This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone runs out of hours by week three. Agents do not. JobFinderOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
+This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone has limited hours in the week. Agents do not. JobFinderOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
 
 This manual covers four things:
 
