@@ -4,13 +4,7 @@
 
 <h1 align="center">JobFinderOS</h1>
 
-<p align="center">
-  <img src="assets/coach.png" width="114" alt="Coach: Clawd in a ball cap holding a clipboard">&nbsp;&nbsp;&nbsp;
-  <img src="assets/scout.png" width="114" alt="Scout: Clawd in a bucket hat with binoculars">&nbsp;&nbsp;&nbsp;
-  <img src="assets/mark.png" width="114" alt="Mark: Clawd in a green eyeshade reading ticker tape">
-  <br>
-  <sub><b>Coach</b>, the recruiter &nbsp;·&nbsp; <b>Scout</b>, the crawler &nbsp;·&nbsp; <b>Mark</b>, the market analyst</sub>
-</p>
+<p align="center"><b>Find your dream job with Claude Code agents. No coffee breaks, no doomscrolling, no sleep till you're hired!</b></p>
 
 This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone runs out of hours by week three. Agents do not. JobFinderOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
 
@@ -31,11 +25,19 @@ JobFinderOS is a set of agent personas and skills that run inside [Claude Code](
 
 **Three agents, each with one job.**
 
-| | Agent | What it does | What it can touch |
-|---|---|---|---|
-| <img src="assets/coach.png" width="72" alt=""> | **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
-| <img src="assets/scout.png" width="72" alt=""> | **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
-| <img src="assets/mark.png" width="72" alt=""> | **Mark** | The market analyst. Tracks funding, leadership moves, new team build-outs, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
+<p align="center">
+  <img src="assets/coach.png" width="114" alt="Coach: Clawd in a ball cap holding a clipboard">&nbsp;&nbsp;&nbsp;
+  <img src="assets/scout.png" width="114" alt="Scout: Clawd in a bucket hat with binoculars">&nbsp;&nbsp;&nbsp;
+  <img src="assets/mark.png" width="114" alt="Mark: Clawd in a green eyeshade reading ticker tape">
+  <br>
+  <sub><b>Coach</b>, the recruiter &nbsp;·&nbsp; <b>Scout</b>, the crawler &nbsp;·&nbsp; <b>Mark</b>, the market analyst</sub>
+</p>
+
+| Agent | What it does | What it can touch |
+|---|---|---|
+| **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
+| **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
+| **Mark** | The market analyst. Tracks funding, leadership moves, new team build-outs, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
 
 > [!IMPORTANT]
 > **🔒 Privacy by Design**
