@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""JobScoutOS scheduled guard: weekly Mark brief (local Claude skill)."""
+"""JobFinderOS scheduled guard: weekday daily jobs (local Claude skill)."""
 from __future__ import annotations
 
 import json
 import os
 import subprocess
-from datetime import datetime, timedelta
+from datetime import datetime, time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -31,9 +31,10 @@ def _tz():
     return datetime.now().astimezone().tzinfo
 
 LOCAL_TZ = _tz()
-MARKER = ROOT / 'logs' / 'scheduler-cron' / 'weekly-market-brief.last-success'
-LOCK = ROOT / 'logs' / 'scheduler-cron' / 'weekly-market-brief.lock'
-MARKET_DIR = ROOT / 'vault' / 'Market Intel'
+MARKER = ROOT / 'logs' / 'scheduler-cron' / 'daily-job-pulse.last-success'
+LOCK = ROOT / 'logs' / 'scheduler-cron' / 'daily-job-pulse.lock'
+DIGEST_DIR = ROOT / 'vault' / 'Daily Digests'
+FOLLOWUP = ROOT / 'vault' / 'Tracking' / 'Email Follow-ups Queue.md'
 
 
 def emit(payload: dict) -> None:
@@ -70,8 +71,8 @@ def acquire_lock(lock_path: Path) -> bool:
     return True
 
 
-def newest_matching(prefix: str) -> str | None:
-    files = [p for p in MARKET_DIR.glob(f'{prefix}*.md') if p.is_file()]
+def latest_digest() -> str | None:
+    files = [p for p in DIGEST_DIR.glob('*.md') if p.is_file()]
     if not files:
         return None
     files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
@@ -80,30 +81,32 @@ def newest_matching(prefix: str) -> str | None:
 
 def main() -> None:
     now = datetime.now(LOCAL_TZ)
-    week = now.strftime('%G-W%V')
-    monday = (now - timedelta(days=now.weekday())).replace(hour=8, minute=30, second=0, microsecond=0)
-    if now < monday:
-        emit({'status': 'skip', 'reason': 'before_window', 'week': week})
+    today = now.strftime('%Y-%m-%d')
+    if now.weekday() >= 5:
+        emit({'status': 'skip', 'reason': 'weekend', 'today': today})
         return
-    if MARKER.exists() and MARKER.read_text().strip() == week:
-        emit({'status': 'skip', 'reason': 'already_succeeded', 'week': week})
+    if now.time() < time(7, 15):
+        emit({'status': 'skip', 'reason': 'before_window', 'today': today})
+        return
+    if MARKER.exists() and MARKER.read_text().strip() == today:
+        emit({'status': 'skip', 'reason': 'already_succeeded', 'today': today})
         return
     active = lock_status(LOCK)
     if active:
-        emit({'status': 'skip', 'reason': active, 'week': week})
+        emit({'status': 'skip', 'reason': active, 'today': today})
         return
     if not acquire_lock(LOCK):
-        emit({'status': 'skip', 'reason': 'in_progress', 'week': week})
+        emit({'status': 'skip', 'reason': 'in_progress', 'today': today})
         return
 
     try:
-        cmd = ['bash', 'scripts/JobScoutOS_run_skill.sh', 'mark-weekly', 'mark-weekly']
+        cmd = ['bash', 'scripts/JobFinderOS_run_skill.sh', 'jobs-daily', 'jobs-daily']
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         if proc.returncode != 0:
             emit({
                 'status': 'error',
-                'reason': 'run_weekly_failed',
-                'week': week,
+                'reason': 'run_daily_failed',
+                'today': today,
                 'returncode': proc.returncode,
                 'stdout_tail': proc.stdout[-4000:],
                 'stderr_tail': proc.stderr[-4000:],
@@ -111,12 +114,13 @@ def main() -> None:
             return
 
         MARKER.parent.mkdir(parents=True, exist_ok=True)
-        MARKER.write_text(week + '\n')
+        MARKER.write_text(today + '\n')
+        digest = DIGEST_DIR / f'{today}.md'
         emit({
             'status': 'success',
-            'week': week,
-            'weekly_brief': newest_matching('Weekly Brief'),
-            'mark_followup': newest_matching('Mark Follow-up'),
+            'today': today,
+            'digest': str(digest if digest.exists() else Path(latest_digest() or '')),
+            'followup': str(FOLLOWUP) if FOLLOWUP.exists() else None,
         })
     finally:
         LOCK.unlink(missing_ok=True)

@@ -20,8 +20,8 @@ vault/**
 !vault/Tracking/Companies.md
 !vault/Tracking/Email Follow-ups Queue.md
 !vault/Automation/
-!vault/Automation/JobScoutOS — Local Runbook.md
-!vault/Automation/JobScoutOS — Schedule & Run Log.md
+!vault/Automation/JobFinderOS — Local Runbook.md
+!vault/Automation/JobFinderOS — Schedule & Run Log.md
 !vault/Daily Digests/
 !vault/Market Intel/
 !vault/Outreach Drafts/

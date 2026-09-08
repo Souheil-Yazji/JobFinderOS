@@ -12,7 +12,7 @@ description: Market pulse. Scan the target cohort for funding, leadership moves,
 1. Read `config/profile.md` (target tiers, priority companies, watch list, ATS table), `config/scoring_rubric.md`, and `vault/Market Intel/Jobs Handoff.json`.
 2. Scan primary sources (`WebSearch`/`WebFetch`, never aggregators) across the target set for: Series B+ funding, new revenue leadership (field hiring follows in 60 to 90 days), enterprise GTM build-outs, function renames, and any company worth adding to the target set.
 3. Write `vault/Market Intel/Daily Marketing Brief — <today>.md`:
-   - `> **JobScoutOS:** Mark · <today> <time> TZ`
+   - `> **JobFinderOS:** Mark · <today> <time> TZ`
    - `# Daily Marketing Brief — <today>`
    - `## Market Context and Top Signals` with inline source links
    - `## Tracked Companies — Current Status`: every Tier 1/2 company, one status line plus its careers link; flag live roles

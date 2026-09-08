@@ -9,7 +9,7 @@ CRON_DIR="$ROOT/logs/scheduler-cron"
 RUN_LOG="$ROOT/logs/launchd-runs.log"
 DIGEST="$ROOT/vault/Daily Digests/${TODAY}.md"
 
-echo "=== JobScoutOS local automation verification ==="
+echo "=== JobFinderOS local automation verification ==="
 echo "Date: $TODAY"
 echo
 

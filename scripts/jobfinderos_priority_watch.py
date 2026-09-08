@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""JobScoutOS scheduled guard: weekday priority-function watch (local Claude skill). Window from config/scheduler.yaml `watch:`."""
+"""JobFinderOS scheduled guard: weekday priority-function watch (local Claude skill). Window from config/scheduler.yaml `watch:`."""
 from __future__ import annotations
 
 import json
@@ -91,7 +91,7 @@ def main() -> None:
         return
 
     try:
-        cmd = ['bash', 'scripts/JobScoutOS_run_skill.sh', 'priority-watch', 'jobs-priority-watch']
+        cmd = ['bash', 'scripts/JobFinderOS_run_skill.sh', 'priority-watch', 'jobs-priority-watch']
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         if proc.returncode != 0:
             emit({

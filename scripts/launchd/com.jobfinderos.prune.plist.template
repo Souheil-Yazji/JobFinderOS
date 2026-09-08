@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.jobscoutos.prune</string>
+  <string>com.jobfinderos.prune</string>
   <key>ProgramArguments</key>
   <array>
     <string>__PYTHON__</string>
-    <string>__REPO__/scripts/jobscoutos_prune_history.py</string>
+    <string>__REPO__/scripts/jobfinderos_prune_history.py</string>
   </array>
   <key>WorkingDirectory</key>
   <string>__REPO__</string>

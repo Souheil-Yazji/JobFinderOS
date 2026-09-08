@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JobScoutOS - local direct-ATS poller.
+JobFinderOS - local direct-ATS poller.
 ================================================================================
 Finds NEW matching reqs by hitting each target company's ATS JSON API directly.
 Deterministic: HTTP + filter + diff. No LLM, no API keys. Every filter below is
@@ -16,7 +16,7 @@ Pipeline:
                         region regexes below for other countries.
       -> COMP gate (parsed range midpoint must clear filters.min_comp; unparseable =
                     surface as "comp unverified" - fails OPEN toward surfacing)
-      -> diff against the seen-set (~/.jobscoutos/ats_seen.json)
+      -> diff against the seen-set (~/.jobfinderos/ats_seen.json)
       -> append survivors to vault/Market Intel/ATS Inbox.md (unscored)
       -> desktop-notify only the clean-location ones (tight match)
       -> optionally (--push) commit + push just the inbox
@@ -66,7 +66,7 @@ BOARDS_FILE = ROOT / "config" / "ats_boards.yaml"
 if not BOARDS_FILE.exists():
     BOARDS_FILE = ROOT / "config" / "ats_boards.example.yaml"
 INBOX = ROOT / "vault" / "Market Intel" / "ATS Inbox.md"
-STATE_DIR = Path.home() / ".jobscoutos"
+STATE_DIR = Path.home() / ".jobfinderos"
 STATE_FILE = STATE_DIR / "ats_seen.json"
 LOG_FILE = ROOT / "logs" / "ats-poll.log"
 
@@ -81,7 +81,7 @@ DEFAULT_FILTERS = {
     "home_region_terms": "",              # regex alternatives for your home city/state; empty = none
     "home_region_label": "home region",
     "lane_labels": {"A": "Priority function", "B": "Secondary function"},
-    "user_agent": "JobScoutOS-ATS-Poller/1.0 (personal job search)",
+    "user_agent": "JobFinderOS-ATS-Poller/1.0 (personal job search)",
 }
 
 
@@ -520,12 +520,12 @@ def render_entry(r: Req) -> str:
     )
 
 
-INBOX_HEADER = """> **JobScoutOS:** ATS Poller · local direct-ATS sweep · [[Dashboard]] · [[Strategy]]
+INBOX_HEADER = """> **JobFinderOS:** ATS Poller · local direct-ATS sweep · [[Dashboard]] · [[Strategy]]
 
 # ATS Inbox
 
 Newly-discovered reqs found by the local direct-ATS poller
-(`scripts/jobscoutos_ats_poll.py`), pending scoring by the daily digest.
+(`scripts/jobfinderos_ats_poll.py`), pending scoring by the daily digest.
 
 **How this works:** the poller is deterministic — it only filters (leadership title,
 location, comp floor) and diffs against a seen-set. It does **not** score. The daily
@@ -567,7 +567,7 @@ def notify(tight: list[Req]) -> None:
                 "osascript",
                 "-e",
                 f'display notification {json.dumps(msg)} with title {json.dumps(title)} '
-                f'subtitle "JobScoutOS · ATS Inbox"',
+                f'subtitle "JobFinderOS · ATS Inbox"',
             ],
             check=False,
             timeout=10,
@@ -613,7 +613,7 @@ def push_inbox(count: int) -> None:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="JobScoutOS local direct-ATS poller")
+    ap = argparse.ArgumentParser(description="JobFinderOS local direct-ATS poller")
     ap.add_argument("--seed", action="store_true", help="mark all current reqs seen; write nothing else")
     ap.add_argument("--dry-run", action="store_true", help="print decisions, change nothing")
     ap.add_argument("--push", action="store_true", help="after a real run, git commit + push the inbox")

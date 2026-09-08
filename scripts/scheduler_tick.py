@@ -2,7 +2,7 @@
 """
 Master scheduler tick — invoked every StartInterval by launchd (or manually).
 Decides whether to run daily Jobs, weekly Mark+Jobs, or neither based on
-config/scheduler.yaml and ~/.jobscoutos/scheduler_state.json.
+config/scheduler.yaml and ~/.jobfinderos/scheduler_state.json.
 
 Rules:
 - Weekly: at most once per ISO week, after this week's scheduled weekday+time (catch-up if missed).
@@ -38,13 +38,13 @@ def project_root() -> Path:
 
 
 def state_path() -> Path:
-    d = Path.home() / ".jobscoutos"
+    d = Path.home() / ".jobfinderos"
     d.mkdir(parents=True, exist_ok=True)
     return d / STATE_FILENAME
 
 
 def lock_path() -> Path:
-    d = Path.home() / ".jobscoutos"
+    d = Path.home() / ".jobfinderos"
     d.mkdir(parents=True, exist_ok=True)
     return d / LOCK_FILENAME
 
@@ -171,7 +171,7 @@ def run_skill(root: Path, label: str, skill: str) -> int:
     env = os.environ.copy()
     env["PATH"] = f"{root / '.venv' / 'bin'}:{env.get('PATH', '')}"
     return subprocess.run(
-        ["/bin/bash", str(root / "scripts" / "JobScoutOS_run_skill.sh"), label, skill],
+        ["/bin/bash", str(root / "scripts" / "JobFinderOS_run_skill.sh"), label, skill],
         cwd=str(root),
         env=env,
     ).returncode
@@ -182,7 +182,7 @@ def run_watch_guards(root: Path) -> None:
     env = os.environ.copy()
     env["PATH"] = f"{root / '.venv' / 'bin'}:{env.get('PATH', '')}"
     subprocess.run(
-        [sys.executable, str(root / "scripts" / "jobscoutos_priority_watch.py")],
+        [sys.executable, str(root / "scripts" / "jobfinderos_priority_watch.py")],
         cwd=str(root),
         env=env,
     )
@@ -200,7 +200,7 @@ def run_script(root: Path, script: str) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="JobScoutOS scheduler tick")
+    ap = argparse.ArgumentParser(description="JobFinderOS scheduler tick")
     ap.add_argument("--dry-run", action="store_true", help="Print decisions only; do not run jobs")
     ap.add_argument("--config", type=Path, help="Override path to scheduler.yaml (default: ROOT/config/scheduler.yaml)")
     args = ap.parse_args()

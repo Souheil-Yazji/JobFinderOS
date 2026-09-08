@@ -1,4 +1,4 @@
-# Recruiter Playbook — Operating Doctrine for All JobScoutOS Agents
+# Recruiter Playbook — Operating Doctrine for All JobFinderOS Agents
 
 Every skill reads this file before acting. This is HOW the agents work; `profile.md` is WHAT they're looking for; `scoring_rubric.md` is how they score it.
 

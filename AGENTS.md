@@ -1,10 +1,10 @@
-# AGENTS.md — JobScoutOS
+# AGENTS.md — JobFinderOS
 
 Guidance for coding agents and IDE copilots working on this repository (the humans' instructions for the *job-search* agents are in `CLAUDE.md`).
 
 ## What this is
 
-An agentic job-search system on Claude Code: three personas in `.claude/agents/`, skills in `.claude/commands/`, doctrine in `config/recruiter_playbook.md`, output in an Obsidian vault at `vault/`. Scheduled runs go launchd → `scripts/scheduler_tick.py` → `scripts/JobScoutOS_run_skill.sh` → `claude -p /skill`.
+An agentic job-search system on Claude Code: three personas in `.claude/agents/`, skills in `.claude/commands/`, doctrine in `config/recruiter_playbook.md`, output in an Obsidian vault at `vault/`. Scheduled runs go launchd → `scripts/scheduler_tick.py` → `scripts/JobFinderOS_run_skill.sh` → `claude -p /skill`.
 
 ## Read first
 
@@ -22,9 +22,9 @@ An agentic job-search system on Claude Code: three personas in `.claude/agents/`
 ## Quick commands
 
 ```bash
-bash scripts/JobScoutOS_check_local_runner.sh
-bash scripts/JobScoutOS_run_skill.sh jobs-daily jobs-daily
+bash scripts/JobFinderOS_check_local_runner.sh
+bash scripts/JobFinderOS_run_skill.sh jobs-daily jobs-daily
 python3 scripts/scheduler_tick.py --dry-run
-bash scripts/JobScoutOS_install_launchd.sh
-python3 scripts/jobscoutos_ats_poll.py --dry-run
+bash scripts/JobFinderOS_install_launchd.sh
+python3 scripts/jobfinderos_ats_poll.py --dry-run
 ```

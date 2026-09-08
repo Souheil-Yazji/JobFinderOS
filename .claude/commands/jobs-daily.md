@@ -16,7 +16,7 @@ Four passes. Delegate each to its agent via the Agent tool; if the Agent tool is
 
 Then, in this session:
 4. Consolidate into `vault/Archive/Daily Jobs Watch/Daily Jobs Watch — <today>.md`: market signals, new roles with human paths, pipeline changes, replies due, prep actions.
-5. Append a run row to `vault/Automation/JobScoutOS — Schedule & Run Log.md`.
+5. Append a run row to `vault/Automation/JobFinderOS — Schedule & Run Log.md`.
 6. One consolidated **Recruiter's read** covering market, pipeline, and the single most important move today. If replies are due, list them and offer to draft; write nothing until the candidate says yes.
 
 ## Rules

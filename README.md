@@ -1,6 +1,10 @@
-# JobScoutOS
+<p align="center">
+  <img src="assets/hero.svg" width="352" alt="Clawd, the Claude Code mascot, in a prospector's hat with a pickaxe and a gold nugget">
+</p>
 
-This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone runs out of hours by week three. Agents do not. JobScoutOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
+<h1 align="center">JobFinderOS</h1>
+
+This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone runs out of hours by week three. Agents do not. JobFinderOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
 
 This manual covers four things:
 
@@ -15,15 +19,15 @@ Plus a short [reference](#5-reference) at the end.
 
 ## 1. What it is
 
-JobScoutOS is a set of agent personas and skills that run inside [Claude Code](https://claude.com/claude-code) and work for you to identify career opportunities based on your criteria. They watch the market, find roles, keep your pipeline up to date and honest, and get you ready for every interview. They write everything to a folder of Markdown notes, which you can open in [Obsidian](https://obsidian.md) or any text editor.
+JobFinderOS is a set of agent personas and skills that run inside [Claude Code](https://claude.com/claude-code) and work for you to identify career opportunities based on your criteria. They watch the market, find roles, keep your pipeline up to date and honest, and get you ready for every interview. They write everything to a folder of Markdown notes, which you can open in [Obsidian](https://obsidian.md) or any text editor.
 
 **Three agents, each with one job.**
 
-| Agent | What it does | What it can touch |
-|---|---|---|
-| **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
-| **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
-| **Mark** | The market analyst. Tracks funding, leadership moves, new team build-outs, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
+| | Agent | What it does | What it can touch |
+|---|---|---|---|
+| <img src="assets/coach.svg" width="72" alt=""> | **Coach** | The recruiter brain. Judges the pipeline, preps you for interviews, runs mock interviews, keeps your career stories, drafts outreach and cover letters in your voice, checks drafts for AI tells, writes a postmortem on every loss, and produces the morning digest. | Everything, including reading your Gmail. Never sends. |
+| <img src="assets/scout.svg" width="72" alt=""> | **Scout** | The crawler. Scans your target companies' own careers pages, scores each role against your rubric, and logs the good ones as opportunity notes. | Web and the vault. No email. |
+| <img src="assets/mark.svg" width="72" alt=""> | **Mark** | The market analyst. Tracks funding, leadership moves, new team build-outs, and job-title renames at the companies you care about, and tells Scout and Coach where to look next. | Web and the vault. No email. |
 
 **Skills are the commands you run.** Each is a short Markdown prompt in `.claude/commands/`. You type `/jobs-daily` or `/mock-interview` in Claude Code and the right agent picks it up. There are 25. Section 3 lists them by when you would use them.
 
@@ -50,8 +54,8 @@ JobScoutOS is a set of agent personas and skills that run inside [Claude Code](h
 ### Install
 
 ```bash
-git clone https://github.com/matthewprice/JobScoutOS.git
-cd JobScoutOS
+git clone https://github.com/matthewprice/JobFinderOS.git
+cd JobFinderOS
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 claude
@@ -93,7 +97,7 @@ Connect Gmail as an MCP connector in claude.ai. Coach can then triage recruiter 
 ### Optional: put it on a schedule (macOS)
 
 ```bash
-bash scripts/JobScoutOS_install_launchd.sh
+bash scripts/JobFinderOS_install_launchd.sh
 ```
 
 One LaunchAgent ticks every 30 minutes. When a window in `config/scheduler.yaml` comes due it runs `/jobs-daily` (every day), `/mark-weekly` (once a week), and a narrow weekday watch on your priority function. Your Mac has to be awake. A missed run catches up on the next tick. Runs are logged to `logs/` and mirrored to `vault/Automation/`.
@@ -254,10 +258,14 @@ Daily digests, run summaries, and daily briefs keep 30 days. Weekly briefs keep 
 
 ```bash
 python3 scripts/scheduler_tick.py --dry-run             # what would run right now
-bash scripts/JobScoutOS_run_skill.sh jobs-daily jobs-daily   # run one skill the way the scheduler does
-bash scripts/JobScoutOS_check_local_runner.sh          # is Claude Code reachable from launchd?
+bash scripts/JobFinderOS_run_skill.sh jobs-daily jobs-daily   # run one skill the way the scheduler does
+bash scripts/JobFinderOS_check_local_runner.sh          # is Claude Code reachable from launchd?
 tail -f logs/launchd-runs.log                            # watch runs
 ```
+
+### Credits
+
+The pixel character is Clawd, the Claude Code mascot. He belongs to Anthropic and is redrawn here in work clothes, with affection and no affiliation.
 
 ### Writing your own skill
 

@@ -46,7 +46,7 @@ Nothing drafted in the candidate's voice may read as AI-written. Before any draf
 - Timeline rows: `| YYYY-MM-DD HH:MM TZ | what happened |`. Communication log rows: `| when | channel | summary |`.
 - Edit `Dashboard.md` minimally and preserve hand-written rationale. `Strategy.md` funnel snapshots and objection log are owned by `/mark-weekly` and `/postmortem`; `/checkin` owns the Dashboard pulse.
 - Durable memory lives in `Strategy.md`, `Tracking/`, `Companies/`. Never in old digests; history is pruned on a rolling window and git is the archive.
-- Log skill runs to `vault/Automation/JobScoutOS — Schedule & Run Log.md` when the skill says to.
+- Log skill runs to `vault/Automation/JobFinderOS — Schedule & Run Log.md` when the skill says to.
 
 ## When you run as a subagent
 You have no conversation with the candidate. Do the batch work, write the vault, and return a report: files written, pipeline changes, anything due (drafts to offer, decisions to make), and the Recruiter's read. Never draft outreach in subagent mode; flag it as due so the main session can offer it.

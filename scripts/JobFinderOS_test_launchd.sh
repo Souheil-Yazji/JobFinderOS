@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Manually trigger JobScoutOS launchd scheduler and show recent log output.
-# Usage: bash scripts/JobScoutOS_test_launchd.sh
+# Manually trigger JobFinderOS launchd scheduler and show recent log output.
+# Usage: bash scripts/JobFinderOS_test_launchd.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DOMAIN="gui/$(id -u)"
-LABEL="com.jobscoutos.scheduler"
+LABEL="com.jobfinderos.scheduler"
 
-echo "JobScoutOS launchd test — $(date)"
+echo "JobFinderOS launchd test — $(date)"
 echo "ROOT=$ROOT"
 echo ""
 
@@ -31,7 +31,7 @@ echo "=== launchd-runs.log (last 20 lines) ==="
 if [[ -f "$RUNS" ]]; then tail -20 "$RUNS"; else echo "(no file yet — runs after next tick)"; fi
 echo ""
 
-LEGACY_ERR="$ROOT/logs/launchd-com.jobscoutos.jobs-daily.err"
+LEGACY_ERR="$ROOT/logs/launchd-com.jobfinderos.jobs-daily.err"
 if [[ -f "$LEGACY_ERR" ]] && grep -q "Operation not permitted" "$LEGACY_ERR" 2>/dev/null; then
   echo "NOTE: legacy 'Operation not permitted' in jobs-daily.err — old agent; current scheduler is ${LABEL}."
 fi

@@ -32,7 +32,7 @@ Due today: <overdue nudges, cadence touches, decisions>
 `> Updated:` and the funnel pulse (counts, warm-attached %, live threads, last-outreach days); `🗓️ Scheduled`; `🎯 Now` (remove done, insert new ranked by leverage, ≤6 plus overdue/decide lines); `🔴 Live human threads`; `📬 Applications`; `🧠 Interviewing` / `❌ Recent closures` / `👀 Priority watch` as changed. Never rewrite hand-written rationale.
 
 ### Step 7 — Log
-`vault/Automation/JobScoutOS — Schedule & Run Log.md`: `| <today> <HH:MM> TZ | checkin | <N> actions, <M> threads aged: <summary> |`
+`vault/Automation/JobFinderOS — Schedule & Run Log.md`: `| <today> <HH:MM> TZ | checkin | <N> actions, <M> threads aged: <summary> |`
 
 ### Step 8 — Recruiter's read (required)
 What today's state means, the pattern forming, the uncomfortable truth, the next inflection point. Then one line: applied today / interviewing / top of tomorrow's queue.

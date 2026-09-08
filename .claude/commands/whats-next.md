@@ -30,7 +30,7 @@ Best first. Every option names real companies, people, dates. Generic advice nev
 **Warm-path gate:** if the action is an application, run `/warm-path` logic first; reachable path → outreach now, apply 48 to 72h later. **Inline:** drafts (a chosen option whose deliverable is a draft counts as yes; otherwise ask) to clipboard and vault via `/draft-message` rules; role verification direct on the ATS; borderline decisions with evidence; talking-point refreshes. **Route to the skill** and say so: `/jobs-prep`, `/day-of-card`, `/mock-interview`, `/jobs-cover`, `/jobs-research` or `/mark-profiler`, `/network-outreach`, `/draft-message`, `/jobs-scout`, `/jobs-email` or `/email-watch`, `/postmortem`, `/voice-check`.
 
 ### Step 6 — Sync
-Opportunity note (stage, dates, timeline); Dashboard (item, `> Updated:`, pulse); queue; Contacts (touches, warmth, caps); communication log; one row in `vault/Automation/JobScoutOS — Schedule & Run Log.md` (`whats-next | <action>`). Minimum edits.
+Opportunity note (stage, dates, timeline); Dashboard (item, `> Updated:`, pulse); queue; Contacts (touches, warmth, caps); communication log; one row in `vault/Automation/JobFinderOS — Schedule & Run Log.md` (`whats-next | <action>`). Minimum edits.
 
 ### Step 7 — Loop
 Remove the completed action, re-rank (regenerate if the world changed), add anything new, tighter each pass. On stop: **Recruiter's read**: what got done, what it changed, whether the week's pace holds the deadline math in §10, the top of the queue next time.

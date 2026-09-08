@@ -1,13 +1,13 @@
-# JobScoutOS — Claude Project Instructions
+# JobFinderOS — Claude Project Instructions
 
-JobScoutOS is an agentic job-search system that runs on Claude Code. Three agents (a recruiter, a crawler, a market analyst) work for one candidate and write everything into an Obsidian vault. **Nothing about the candidate is hardcoded here.** Every agent reads `config/profile.md` first and takes the candidate's name, targets, comp floor, location rules, and exclusions from it.
+JobFinderOS is an agentic job-search system that runs on Claude Code. Three agents (a recruiter, a crawler, a market analyst) work for one candidate and write everything into an Obsidian vault. **Nothing about the candidate is hardcoded here.** Every agent reads `config/profile.md` first and takes the candidate's name, targets, comp floor, location rules, and exclusions from it.
 
 ---
 
 ## Project layout
 
 ```
-JobScoutOS/
+JobFinderOS/
 ├── CLAUDE.md                  ← you are here
 ├── .claude/
 │   ├── agents/                ← THE PERSONAS: coach.md (recruiter brain), scout.md (crawler), mark.md (market analyst)
@@ -57,7 +57,7 @@ JobScoutOS/
 7. **Be proactive about tangential opportunities** that fit the candidate's strengths, within the seniority filter.
 8. **Warm-path-first (playbook §2):** an application without a human attached is a last resort. Before queuing any application, answer who the candidate knows or can reach at the company; sequence outreach, then apply 48 to 72 hours later. Target 70% or more of applications warm-attached.
 9. **Act like a recruiter, not a clerk (playbook §1):** every skill run ends with a candid **Recruiter's read**, strategic advice and uncomfortable truths, not a recap. Losses get `/postmortem`'d into the Strategy objection log.
-10. **The vault root stays clean:** only `Dashboard.md`, `Strategy.md`, and the machine-generated dated pointer notes (`<Family> — <YYYY-MM-DD>.md`, written by `scripts/jobscoutos_update_latest.py`, gitignored, never created or edited by agents) live at the top level. Run summaries go to `Archive/Daily Jobs Watch/`; everything else has a folder. History is pruned on a rolling window by `scripts/jobscoutos_prune_history.py` (30 days for digests, watches, pulses, briefs; 90 days for weekly briefs). Durable memory lives in `Strategy.md`, `Tracking/`, `Companies/`, never in old digests.
+10. **The vault root stays clean:** only `Dashboard.md`, `Strategy.md`, and the machine-generated dated pointer notes (`<Family> — <YYYY-MM-DD>.md`, written by `scripts/jobfinderos_update_latest.py`, gitignored, never created or edited by agents) live at the top level. Run summaries go to `Archive/Daily Jobs Watch/`; everything else has a folder. History is pruned on a rolling window by `scripts/jobfinderos_prune_history.py` (30 days for digests, watches, pulses, briefs; 90 days for weekly briefs). Durable memory lives in `Strategy.md`, `Tracking/`, `Companies/`, never in old digests.
 11. **Anti-AI-spam is existential (playbook §3):** low outreach volume, the two-fact rule, a human in the loop on every message, no send without the candidate's hands on it. A detected template kills the channel.
 12. **Nothing drafted for the candidate may read as AI-written.** Every draft, in any register, must pass as something they wrote themselves across language, grammar, syntax, and style. This is a hard gate (see **Drafting voice**).
 
@@ -161,7 +161,7 @@ Stages: `🔍 Spotted` → `📝 Applied` → `📞 Screen` → `🧑‍💼 HM 
 ```markdown
 **Run:** YYYY-MM-DD HH:MM TZ
 
-> **JobScoutOS:** Jobs · YYYY-MM-DD HH:MM TZ
+> **JobFinderOS:** Jobs · YYYY-MM-DD HH:MM TZ
 
 # Daily Digest — YYYY-MM-DD
 
@@ -205,7 +205,7 @@ Stages: `🔍 Spotted` → `📝 Applied` → `📞 Screen` → `🧑‍💼 HM 
 
 ## Agent run model — Claude Code (no API keys)
 
-Everything runs through Claude Code with subscription auth. Scheduled automation is **macOS launchd** → `scripts/scheduler_tick.py` → `scripts/JobScoutOS_run_skill.sh` → `claude -p /skill-name` → writes `vault/` on disk. See `vault/Automation/JobScoutOS — Local Runbook.md`.
+Everything runs through Claude Code with subscription auth. Scheduled automation is **macOS launchd** → `scripts/scheduler_tick.py` → `scripts/JobFinderOS_run_skill.sh` → `claude -p /skill-name` → writes `vault/` on disk. See `vault/Automation/JobFinderOS — Local Runbook.md`.
 
 **Three agents, one doctrine.** Personas live in `.claude/agents/` as Claude Code project subagents; each file holds the persona, its doctrine, tool access, and model. Skills are thin task prompts that name their agent in the first line:
 
@@ -248,9 +248,9 @@ Everything runs through Claude Code with subscription auth. Scheduled automation
 |-----|---------|-------|
 | Daily Jobs | tick, once per day after the daily time | `jobs-daily` |
 | Weekly Mark | tick, once per week after the weekly slot (weekly wins over daily that day) | `mark-weekly` |
-| Priority watch | `jobscoutos_priority_watch.py` each tick, weekdays after the watch time | `jobs-priority-watch` |
+| Priority watch | `jobfinderos_priority_watch.py` each tick, weekdays after the watch time | `jobs-priority-watch` |
 
-Optional helpers, installed by `scripts/JobScoutOS_install_helpers.sh`: the deterministic ATS poller (`jobscoutos_ats_poll.py`, writes `vault/Market Intel/ATS Inbox.md`), the retention pruner, and the pointer-note writer.
+Optional helpers, installed by `scripts/JobFinderOS_install_helpers.sh`: the deterministic ATS poller (`jobfinderos_ats_poll.py`, writes `vault/Market Intel/ATS Inbox.md`), the retention pruner, and the pointer-note writer.
 
 All searching goes **directly to company careers pages and ATS boards** (URL table in `config/profile.md`), never aggregators.
 

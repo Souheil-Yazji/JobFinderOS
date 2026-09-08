@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-JobScoutOS - "Latest ..." pointer notes at the vault root.
+JobFinderOS - "Latest ..." pointer notes at the vault root.
 ================================================================================
 Keeps one pointer note per digest family at the top level of the vault, each
 embedding (transcluding) the newest dated note in its family, so you can
 open "Latest Daily Digest" in Obsidian and always see today's content.
 
 Mechanics:
-  * A launchd job (com.jobscoutos.latest) runs this via WatchPaths on the
+  * A launchd job (com.jobfinderos.latest) runs this via WatchPaths on the
     digest directories - any write there (local skill run,
     retention prune) re-points the notes within seconds. RunAtLoad trues it
     up at login. Idempotent: rewrites a pointer only when the target changes.
@@ -73,8 +73,8 @@ def pointer_body(title: str, target: Path, date: str) -> str:
     # Obsidian wikilinks resolve by path-from-vault-root without extension.
     link = str(target.relative_to(VAULT).with_suffix(""))
     return (
-        f"> **JobScoutOS:** auto-generated pointer — do not edit "
-        f"(rewritten by `scripts/jobscoutos_update_latest.py` whenever a newer "
+        f"> **JobFinderOS:** auto-generated pointer — do not edit "
+        f"(rewritten by `scripts/jobfinderos_update_latest.py` whenever a newer "
         f"{title} lands). [[{link}|Open the note →]]\n"
         f"\n"
         f"# {title} — {date}\n"

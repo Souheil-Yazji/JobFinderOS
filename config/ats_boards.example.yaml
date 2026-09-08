@@ -1,5 +1,5 @@
-# JobScoutOS — ATS board registry + filters for the deterministic poller
-# (scripts/jobscoutos_ats_poll.py). Copy to config/ats_boards.yaml (gitignored)
+# JobFinderOS — ATS board registry + filters for the deterministic poller
+# (scripts/jobfinderos_ats_poll.py). Copy to config/ats_boards.yaml (gitignored)
 # and edit. The poller falls back to this example file if no copy exists.
 #
 # Board fields:
@@ -27,7 +27,7 @@ filters:
   lane_labels:
     A: "Widget design"
     B: "Gadget design"
-  user_agent: "JobScoutOS-ATS-Poller/1.0 (personal job search)"
+  user_agent: "JobFinderOS-ATS-Poller/1.0 (personal job search)"
 
 boards:
   # These three are real public boards, here only as syntax examples. Replace them

@@ -1,8 +1,8 @@
-> **JobScoutOS:** system
+> **JobFinderOS:** system
 
-# JobScoutOS automation
+# JobFinderOS automation
 
-Run `bash scripts/JobScoutOS_install_launchd.sh` to (re)generate this header and install the scheduler.
+Run `bash scripts/JobFinderOS_install_launchd.sh` to (re)generate this header and install the scheduler.
 
 ## Run log
 

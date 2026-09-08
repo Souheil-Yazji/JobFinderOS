@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JobScoutOS - vault history retention pruner.
+JobFinderOS - vault history retention pruner.
 ================================================================================
 Deletes historical, write-only vault notes past their retention window. Git is
 the permanent archive (every pruned file stays recoverable via `git show`);
@@ -19,7 +19,7 @@ Safety rails:
     read "the most recent" digest/pulse, and a stalled pipeline must not lose
     its only copy.
   * Deletions are committed on their own and pushed (same HTTPS/keychain flow
-    as jobscoutos_ats_poll.py). --dry-run prints, touches nothing.
+    as jobfinderos_ats_poll.py). --dry-run prints, touches nothing.
 
 Flags:
   --dry-run   print what would be deleted, change nothing
@@ -49,7 +49,7 @@ os.environ["PATH"] = ":".join([
 ])
 
 ROOT = Path(__file__).resolve().parent.parent
-RUN_LOG = ROOT / "vault" / "Automation" / "JobScoutOS — Schedule & Run Log.md"
+RUN_LOG = ROOT / "vault" / "Automation" / "JobFinderOS — Schedule & Run Log.md"
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
 # (directory relative to ROOT, filename glob, retention days)

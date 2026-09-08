@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 fail=0
-echo "=== JobScoutOS local runner preflight ==="
+echo "=== JobFinderOS local runner preflight ==="
 
 CLAUDE_BIN="${CLAUDE_BIN:-$(command -v claude || true)}"
 if [[ -z "$CLAUDE_BIN" || ! -x "$CLAUDE_BIN" ]]; then
@@ -30,10 +30,10 @@ for skill in jobs-daily mark-weekly jobs-priority-watch; do
   fi
 done
 
-if [[ -x "$ROOT/scripts/JobScoutOS_run_skill.sh" ]]; then
-  echo "OK: JobScoutOS_run_skill.sh executable"
+if [[ -x "$ROOT/scripts/JobFinderOS_run_skill.sh" ]]; then
+  echo "OK: JobFinderOS_run_skill.sh executable"
 else
-  echo "FAIL: scripts/JobScoutOS_run_skill.sh missing or not executable"
+  echo "FAIL: scripts/JobFinderOS_run_skill.sh missing or not executable"
   fail=1
 fi
 

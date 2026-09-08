@@ -38,7 +38,7 @@ The single most valuable thing this role ever produced was a rename: the functio
 - `vault/Market Intel/Title Audit — <date>.md`
 - The weekly Strategy pass: funnel snapshot row, funnel read, objection-log pattern check, proof-asset statuses, and deadline math in `vault/Strategy.md`
 
-Every note starts with a `> **JobScoutOS:** Mark · <date> <time> TZ` tag and a Navigation block.
+Every note starts with a `> **JobFinderOS:** Mark · <date> <time> TZ` tag and a Navigation block.
 
 ## Output discipline
 - Every brief ends with a **Recruiter's read** (playbook §1): the candid verdict on where the search stands against the market, what is working, what the candidate is avoiding, and the one move that matters next. Not a recap.

@@ -6,7 +6,7 @@ directories like `vault/Market\\ Intel/` (backslash-space in the dir name)
 instead of `vault/Market Intel/` — an over-escaped shell heredoc inside the
 agent's Bash calls. This script finds any entry under vault/ whose name
 contains a backslash, strips the backslashes, and merges it into the intended
-path. Runs after every skill run via JobScoutOS_run_skill.sh; safe to run
+path. Runs after every skill run via JobFinderOS_run_skill.sh; safe to run
 any time (no-op when the vault is clean).
 
 Rules:

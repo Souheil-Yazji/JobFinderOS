@@ -13,7 +13,7 @@ description: Weekly brief. Market pulse, the weekly brief, the Jobs Handoff, and
 
 ### Deliverables (all required)
 1. **Market Pulse.** Execute the Task section of `.claude/commands/mark-pulse.md` (you are already the right agent).
-2. **Weekly Brief** → `vault/Market Intel/Weekly Brief — <today>.md`, tagged `> **JobScoutOS:** Mark · <today> <time> TZ`, sections aligned to prior briefs: Executive Summary · Market Context: Signals & Insights · Tracked Target Company Updates · Emerging Role Watch (including any rename of the candidate's function) · Fresh Companies/Discovery (past 30 days) · Hiring Cycle Assessment · Action Checklist. The single highest-conviction move at the top.
+2. **Weekly Brief** → `vault/Market Intel/Weekly Brief — <today>.md`, tagged `> **JobFinderOS:** Mark · <today> <time> TZ`, sections aligned to prior briefs: Executive Summary · Market Context: Signals & Insights · Tracked Target Company Updates · Emerging Role Watch (including any rename of the candidate's function) · Fresh Companies/Discovery (past 30 days) · Hiring Cycle Assessment · Action Checklist. The single highest-conviction move at the top.
 3. **Jobs Handoff** → write or replace `vault/Market Intel/Jobs Handoff.json`: `generated_at`, `source`, `written_by_agent: "Mark"`, `priority_now[] {company, why_now, role_types[]}`, `new_to_evaluate[] {company, why_now, action}`.
 4. **Strategy pass** in `vault/Strategy.md`:
    1. Funnel snapshot: append the weekly row (apps, warm-attached, screens, HM, finals, offers, live threads). Recount from the Dashboard and queue; never extrapolate.

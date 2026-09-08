@@ -1,5 +1,5 @@
 ---
-description: Progressive profiling. Deepen the Wins Library and learn the candidate's voice over time, so applications get more tailored the more JobScoutOS is used. Runs on Claude Code, no API keys.
+description: Progressive profiling. Deepen the Wins Library and learn the candidate's voice over time, so applications get more tailored the more JobFinderOS is used. Runs on Claude Code, no API keys.
 ---
 
 **Agent:** `coach` · runs in this session (it is an interview). Read `.claude/agents/coach.md` first.
