@@ -39,7 +39,6 @@ def project_root() -> Path:
 
 def state_path() -> Path:
     d = Path.home() / ".jobfinderos"
-    d.mkdir(parents=True, exist_ok=True)
     return d / STATE_FILENAME
 
 
@@ -74,6 +73,7 @@ def load_state() -> dict[str, Any]:
 
 def save_state(state: dict[str, Any]) -> None:
     p = state_path()
+    p.parent.mkdir(parents=True, exist_ok=True)
     tmp = p.with_suffix(".tmp")
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(state, f, indent=2)
@@ -170,8 +170,10 @@ def daily_is_due(
 def run_skill(root: Path, label: str, skill: str) -> int:
     env = os.environ.copy()
     env["PATH"] = f"{root / '.venv' / 'bin'}:{env.get('PATH', '')}"
+    mapping = yaml.safe_load((root / "config/skill_agents.yaml").read_text())
+    agent = mapping[skill]
     return subprocess.run(
-        ["/bin/bash", str(root / "scripts" / "JobFinderOS_run_skill.sh"), label, skill],
+        ["/bin/bash", str(root / "scripts" / "JobFinderOS_run_agent.sh"), agent, skill, "--label", label],
         cwd=str(root),
         env=env,
     ).returncode
@@ -208,6 +210,18 @@ def main() -> int:
     root = project_root()
     cfg_path = args.config or (root / "config" / "scheduler.yaml")
 
+    # A dry-run only reads configuration/state; no locks, logs, or jobs.
+    if args.dry_run:
+        with open(cfg_path, encoding="utf-8") as f:
+            cfg = yaml.safe_load(f) or {}
+        state = load_state()
+        now = datetime.now().astimezone()
+        weekly_due = weekly_is_due(state, now, cfg)
+        print(json.dumps(dict(now=now.isoformat(), weekly_due=weekly_due,
+                              daily_due=daily_is_due(state, now, cfg, weekly_due),
+                              priority_watch_guard="would be invoked", state=state), indent=2))
+        return 0
+
     lock_fp = open(lock_path(), "a+", encoding="utf-8")
     try:
         fcntl.flock(lock_fp.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -228,21 +242,6 @@ def main() -> int:
         daily_due = daily_is_due(state, now, cfg, weekly_due)
 
         append_run_log(root, "scheduler-tick", "evaluated")
-
-        if args.dry_run:
-            print(
-                json.dumps(
-                    {
-                        "now": now.isoformat(),
-                        "weekly_due": weekly_due,
-                        "daily_due": daily_due,
-                        "priority_watch_guard": "invoked",
-                        "state": state,
-                    },
-                    indent=2,
-                )
-            )
-            return 0
 
         exit_rc = 0
 

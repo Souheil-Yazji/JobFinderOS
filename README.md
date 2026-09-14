@@ -4,9 +4,9 @@
 
 <h1 align="center">JobFinderOS</h1>
 
-<p align="center"><b>Find your dream job with Claude Code agents. No coffee breaks, no doomscrolling, no sleep till you're hired!</b></p>
+<p align="center"><b>Find your next job with local AI agents. No coffee breaks, no doomscrolling, no sleep till you're hired!</b></p>
 
-This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone has limited hours in the week. Agents do not. JobFinderOS is a Claude code project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
+This project capitalizes on one simple fact:  a career search is a numbers game. More real contacts lead to more listings you hear about early, more of those become applications with a person attached, and more of those become interviews. A single human running that chain alone has limited hours in the week. Agents do not. JobFinderOS is a local agent project that puts agents to work on your search, profiling markets, following companies, crawling job postings, identifying new strategic contacts and preparing you for every interview. Each stage of the job search funnel gets more nurturing than you could feed it yourself, and the judgment stays with you.
 
 This manual covers four things:
 
@@ -21,7 +21,7 @@ Plus a short [reference](#5-reference) and a note on [contributing](#contributin
 
 ## 1. What it is
 
-JobFinderOS is a set of agent personas and skills that run inside [Claude Code](https://claude.com/claude-code) and work for you to identify career opportunities based on your criteria. They watch the market, find roles, keep your pipeline up to date and honest, and get you ready for every interview. They write everything to a folder of Markdown notes, which you can open in [Obsidian](https://obsidian.md) or any text editor.
+JobFinderOS is a set of agent personas and skills that run through Codex CLI (with Claude compatibility) and work for you to identify career opportunities based on your criteria. They watch the market, find roles, keep your pipeline up to date and honest, and get you ready for every interview. They write everything to a folder of Markdown notes, which you can open in [Obsidian](https://obsidian.md) or any text editor.
 
 **Three agents, each with one job.**
 
@@ -42,9 +42,9 @@ JobFinderOS is a set of agent personas and skills that run inside [Claude Code](
 > [!IMPORTANT]
 > **🔒 Privacy by Design**
 >
-> A job search is sensitive, so nothing about you is meant to leave your machine. Your profile, scoring rubric, wins, stories, voice notes, target list, and ATS board list are all `.gitignore`d. So is the whole vault, apart from a few empty skeleton files (the Dashboard, Strategy, and Tracking templates) that ship blank; once they fill in, leave them uncommitted. The agents never commit, push, send, or upload anything. The only place your data goes is into the Claude Code session you start yourself, and the only remote it ever reaches is one you add by hand.
+> Candidate records live in local `config/` and `vault/`. Private configuration, generated notes and logs are gitignored. Some shipped vault skeletons (Dashboard, Strategy, tracking tables and automation notes) remain tracked; keep filled-in versions out of commits. The selected CLI/model service processes the information a session reads. Job-search automation never commits, pushes, sends messages, or creates Gmail drafts.
 
-**Skills are the commands you run.** Each is a short Markdown prompt in `.claude/commands/`. You type `/jobs-daily` or `/mock-interview` in Claude Code and the right agent picks it up. There are 25. Section 3 lists them by when you would use them.
+**Skills are the tasks you run.** Each is a short Markdown prompt in `skills/`, with an owner listed in `config/skill_agents.yaml`. There are 25 user-facing tasks plus an internal daily finalizer. Run them with `./scripts/JobFinderOS_run_agent.sh <agent> <skill>`. Section 3 uses `/skill` as shorthand for task names; those remain native slash commands only in the retained Claude compatibility files.
 
 **Your config is what they read first.** `config/profile.md` says who you are and what you want. `config/scoring_rubric.md` says how to score a role. `config/recruiter_playbook.md` says how the agents behave. Section 4 explains that playbook in plain English.
 
@@ -52,20 +52,20 @@ JobFinderOS is a set of agent personas and skills that run inside [Claude Code](
 
 **What it never does.** It never sends an email or a message. Drafts go to your clipboard and the vault, and you send them from your own client. It never mass-applies. It never sits in the interview.
 
-**What it needs.** A Claude Code subscription. No API keys. Python is only used by the optional scheduler.
+**What it needs.** An installed, authenticated Codex CLI and Python with the dependencies in `requirements.txt`. The runner uses saved CLI authentication; no direct LLM API integration is required.
 
 ---
 
 ## 2. Getting up and running
 
-Four steps. The first two happen in your terminal, the last two inside Claude Code.
+Four steps, starting in your terminal. Onboarding opens an interactive session.
 
-### Step 1. Get Claude Code
+### Step 1. Get Codex CLI
 
-You need [Claude Code](https://claude.com/claude-code) installed and logged in with a subscription. No API keys.
+Install Codex CLI and authenticate it. [Official CLI documentation](https://developers.openai.com/codex/cli).
 
 ```bash
-claude auth login
+codex login
 ```
 
 ### Step 2. Clone and install
@@ -77,17 +77,16 @@ git clone https://github.com/matthewprice/JobFinderOS.git
 cd JobFinderOS
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-claude
 ```
 
-The two Python lines need Python 3.11 or newer. They only serve the optional scheduler and helper scripts, so if you never plan to schedule anything you can skip them and go straight to `claude`.
+Use Python 3.11 or newer as recommended by the project. Python runs the agent entrypoint, scheduler and deterministic helpers.
 
 ### Step 3. Teach it who you are
 
-Inside Claude Code:
+From the repository root:
 
-```
-/onboard
+```bash
+./scripts/JobFinderOS_run_agent.sh coach onboard --interactive
 ```
 
 This is a 15-minute conversation. It asks about your current role, what you want next, your salary floor, where you will and will not work, companies to avoid, the exact job titles recruiters use for your target, and two or three real wins with numbers. Any career works. It does not assume you are technical.
@@ -103,8 +102,8 @@ When it finishes you have four private files, all gitignored:
 
 ### Step 4. Run the first scan
 
-```
-/jobs-scout
+```bash
+./scripts/JobFinderOS_run_agent.sh scout jobs-scout
 ```
 
 Scout reads your target companies' careers pages, scores what it finds, and writes an opportunity note for anything that clears your bar. Open `vault/` and read `Dashboard.md`. You are running.
@@ -114,7 +113,7 @@ Scout reads your target companies' careers pages, scores what it finds, and writ
 Each of these is independent. Add them when you want them.
 
 - **Obsidian.** Open `vault/` as a vault in [Obsidian](https://obsidian.md) to read the notes with working links. Any text editor works too.
-- **Gmail.** Connect Gmail as an MCP connector in claude.ai. Coach can then triage recruiter email, spot interview invitations, and detect rejections. It is instructed to read only; Section 5 explains what that rests on.
+- **Gmail.** Configure a Gmail read connector in your selected CLI runtime; Claude connector setup does not transfer automatically to Codex. Coach can then triage recruiter email, spot interview invitations, and detect rejections. It is instructed to read only; Section 5 explains what that rests on.
 - **A schedule (macOS only).** Drafts are copied to the clipboard with `pbcopy` and the scheduler uses launchd, so this part is Mac-specific. Elsewhere, drafts still land in the vault and you run the skills by hand.
 
   ```bash
@@ -138,10 +137,10 @@ Every skill run ends with a **Recruiter's read**: two to five sentences of candi
 
 ### Every day
 
-<img src="assets/coach.png" width="40" alt="Coach"> **Coach** runs these. `/jobs-daily` also sends Scout and Mark out first, then hands what they found to Coach.
+<img src="assets/coach.png" width="40" alt="Coach"> **Coach** runs these. `/jobs-daily` runs Mark, Scout, Coach email, Coach digest, then Coach finalization in separate sequential sessions. Each step reads the completed inputs recorded by the runner.
 
 ```
-/jobs-daily     Market pulse and scout run in parallel, then email triage, then the digest.
+/jobs-daily     Separate Mark and Scout runs, then Coach email, digest, and finalization.
 /checkin        Tick boxes on the Dashboard, tell it what happened, it ages every thread.
 /whats-next     "What should we do next?" It sweeps the pipeline and offers the 3 to 5 best moves.
 ```
@@ -264,18 +263,22 @@ Set a deadline for having an offer in hand. Finals two weeks before that, hiring
 ### Layout
 
 ```
-.claude/agents/      coach.md · scout.md · mark.md         the three agents
-.claude/commands/    25 skills                             each names its agent in the first line
+agents/              coach.md · scout.md · mark.md         canonical personas
+skills/              25 tasks + daily finalizer             canonical tasks
+.claude/             retained Claude compatibility
+config/skill_agents.yaml                                 explicit ownership
 config/              profile, rubric, wins, voice, targets  your copies are gitignored; templates ship
 config/recruiter_playbook.md                               the doctrine in Section 4, in full
 scripts/             scheduler, guards, ATS poller, pruner
 vault/               the Obsidian vault
-CLAUDE.md            project instructions the agents read every run
+AGENTS.md            repository routing and contributor rules
+docs/                shared task instructions and vault templates
+CLAUDE.md            retained Claude project instructions
 ```
 
 ### Email safety
 
-No code in this repository calls a send or draft API. Gmail is reached only through the claude.ai MCP connector, and that connector does expose send and draft tools. What keeps the agents read-only is doctrine: `CLAUDE.md`, the agent files, and the playbook all forbid sending and drafting, and every draft goes to the clipboard and the vault instead. Read those instructions before you trust the system with your inbox; there is no separate technical lock.
+No code in this repository calls a send or draft API. Coach can use configured email read tools; Scout and Mark must not access email. The agent definitions and shared doctrine prohibit sending, forwarding, replying through APIs, and creating Gmail drafts. Output auditing detects prohibited file changes, but is not a tool-level email access lock. A missing connector must be reported as blocked; it is never interpreted as an empty inbox.
 
 ### Privacy
 
@@ -290,7 +293,7 @@ Daily digests, run summaries, and daily briefs keep 30 days. Weekly briefs keep 
 ```bash
 python3 scripts/scheduler_tick.py --dry-run             # what would run right now
 bash scripts/JobFinderOS_run_skill.sh jobs-daily jobs-daily   # run one skill the way the scheduler does
-bash scripts/JobFinderOS_check_local_runner.sh          # is Claude Code reachable from launchd?
+bash scripts/JobFinderOS_check_local_runner.sh          # check the selected runtime and authentication
 tail -f logs/launchd-runs.log                            # watch runs
 ```
 
@@ -302,7 +305,7 @@ The three agents are the same character in different gear. Coach wears the ball 
 
 ### Writing your own skill
 
-Open any file in `.claude/commands/`. The first line names the agent. The rest is the task. Copy one, change the task, save it under a new name, and it is a command.
+Copy a task from `skills/`, retain its Agent and Execution headers, and add its owner to `config/skill_agents.yaml`. Keep persona doctrine in `agents/`. Validate with `bash scripts/verify_local_automation.sh --static`.
 
 ---
 
@@ -310,7 +313,7 @@ Open any file in `.claude/commands/`. The first line names the agent. The rest i
 
 Issues and pull requests are welcome. Bug reports, wording fixes, and "this claim does not match the code" are all useful.
 
-The most valuable contribution is a new skill. Each file in `.claude/commands/` is a short Markdown prompt: a `description` line in the frontmatter, an **Agent** line saying which of Coach, Scout, or Mark runs it, and a Task section. If you have built one that helped your own search, open a pull request with it. A few things to keep in mind:
+The most valuable contribution is a new skill. Each canonical file in `skills/` is a short Markdown prompt with **Agent** and **Execution** headers and a Task section. If you have built one that helped your own search, open a pull request with it. A few things to keep in mind:
 
 - **Keep it career-neutral.** Skills read `config/profile.md` for everything about the candidate. Nothing about a specific person, industry, or company belongs in a skill.
 - **Follow the playbook.** Warm path first, low outreach volume, a human in the loop on every message, and a Recruiter's read at the end. `config/recruiter_playbook.md` is the doctrine; a skill that fights it will not be merged.
@@ -319,15 +322,14 @@ The most valuable contribution is a new skill. Each file in `.claude/commands/` 
 
 Say in the pull request what the skill is for, which agent runs it, and what it wrote to the vault when you ran it. MIT licensed, so contributions are too.
 
-## Codex port: canonical definitions
+## Runtime reference
 
 Runtime-neutral personas are in `agents/`, tasks in `skills/`, and ownership in
 `config/skill_agents.yaml`. Shared directives and note templates are in
 `docs/jobfinderos-instructions.md` and `docs/vault-note-templates.md`.
 Claude commands remain available under `.claude/`. Use `./scripts/JobFinderOS_run_agent.sh scout jobs-scout --dry-run` to inspect a
 task, then omit `--dry-run` to execute it with Codex. Copying these Markdown
-files does not register native Codex skills. Scheduling still uses Claude until
-the orchestration integration lands. Candidate state stays in `config/`
+files does not register native Codex skills. Scheduling now uses the canonical runner and defaults to Codex. Candidate state stays in `config/`
 and `vault/`, and learned preferences stay in `config/voice.md`.
 
 Manual Codex execution needs an authenticated Codex CLI on PATH (or `CODEX_BIN`)
@@ -350,3 +352,28 @@ failure; it leaves those changes for inspection. This is detection, not a
 per-directory sandbox or a tool-level Gmail lock. Research needs live web access;
 Coach email work needs a separately configured read connector. Missing required
 inputs or tools must be reported as blocked. No inbox access is assumed.
+
+`JOBFINDEROS_RUNTIME=claude` selects the optional Claude adapter using the same
+canonical tasks. Original `.claude/` slash commands remain available unchanged
+for direct Claude sessions. Claude model parity is not yet established; retain
+those definitions until representative comparisons pass. The adapter uses normal
+CLI permissions and never bypasses them.
+
+Daily execution is sequential because Mark and Scout both update Dashboard.
+`logs/daily-runs/<id>/run.json` records the current run's children, results and final
+status. Failed or blocked children stop the sequence and do not advance scheduler
+success state. Missing company research for `jobs-prep` runs Mark first.
+
+```bash
+./scripts/JobFinderOS_run_agent.sh coach jobs-daily
+JOBFINDEROS_RUNTIME=claude ./scripts/JobFinderOS_run_agent.sh scout jobs-scout
+bash scripts/verify_local_automation.sh --static
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+The scheduler dry-run reads state without creating locks or logs. The default
+`verify_local_automation.sh` remains an operational check: it requires today's
+digest, so a fresh checkout or weekly-only day can fail it. Use `--static` to check
+configuration without a model or candidate data. The existing master scheduler
+uses system-local time; its priority guard honors `scheduler.yaml`'s timezone.
+This migration preserves that existing distinction.

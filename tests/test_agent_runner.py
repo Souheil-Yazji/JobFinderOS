@@ -26,10 +26,19 @@ class AgentRunner(unittest.TestCase):
             (self.root / 'config' / (name + '.md')).write_text('Fictional candidate: Alex Example. Widget engineering. Exclude BadCo. Minimum score 7.')
         (self.root / 'vault/Automation').mkdir(parents=True)
         self.fake = Path(self.temp.name) / 'fake codex'
-        self.fake.write_text('#!' + sys.executable + '\n' + '''import json, os, pathlib, sys, time
+        self.fake.write_text('#!' + sys.executable + '\n' + '''import json, os, pathlib, re, sys, time
 prompt = sys.stdin.read()
 root = pathlib.Path.cwd()
 (root / 'logs/call.json').write_text(json.dumps({'cwd': str(root), 'args': sys.argv[1:], 'prompt': prompt}))
+skill = re.search(r'Read and execute skills/([a-z-]+)[.]md', prompt).group(1)
+with (root / 'logs/calls.jsonl').open('a') as f: f.write(json.dumps({'skill': skill}) + '\\n')
+if os.environ.get('FAKE_FAIL_SKILL') == skill: sys.exit(17)
+if skill == 'jobs-research':
+    arguments = json.loads(re.search(r'Task arguments .*?: (.*)', prompt).group(1))
+    company = arguments[0]
+    p = root / 'vault/Companies' / company / (company + '.md')
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text('Fictional company profile')
 scenario = os.environ.get('FAKE_SCENARIO', '')
 if scenario == 'timeout': time.sleep(10)
 if scenario == 'fail': sys.exit(17)
@@ -117,6 +126,43 @@ if scenario != 'no-result':
         for agent, skill in [('scout', 'jobs-scout'), ('mark', 'mark-pulse'), ('coach', 'jobs-digest'), ('coach', 'jobs-prep')]:
             result = self.run_agent(agent, skill)
             self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_daily_real_process_sequence_and_one_final_record(self):
+        result = self.run_agent('coach', 'jobs-daily')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line)['skill'] for line in (self.root / 'logs/calls.jsonl').read_text().splitlines()]
+        self.assertEqual(calls, ['mark-pulse', 'jobs-scout', 'jobs-email', 'jobs-digest', 'jobs-daily-finalize'])
+        manifests = list((self.root / 'logs/daily-runs').glob('*/run.json'))
+        self.assertEqual(len(manifests), 1)
+        manifest = json.loads(manifests[0].read_text())
+        self.assertEqual(manifest['status'], 'complete')
+        self.assertEqual(len(manifest['children']), 5)
+        log = (self.root / 'logs/launchd-runs.log').read_text()
+        self.assertEqual(log.count('— jobs-daily — completed'), 1)
+
+    def test_daily_stops_at_every_failed_child(self):
+        sequence = ['mark-pulse', 'jobs-scout', 'jobs-email', 'jobs-digest', 'jobs-daily-finalize']
+        for index, skill in enumerate(sequence):
+            self.env['FAKE_FAIL_SKILL'] = skill
+            (self.root / 'logs').mkdir(exist_ok=True)
+            (self.root / 'logs/calls.jsonl').write_text('')
+            result = self.run_agent('coach', 'jobs-daily')
+            self.assertEqual(result.returncode, 17, result.stderr)
+            calls = [json.loads(line)['skill'] for line in (self.root / 'logs/calls.jsonl').read_text().splitlines()]
+            self.assertEqual(calls, sequence[:index + 1])
+
+    def test_prep_runs_mark_prerequisite(self):
+        result = self.run_agent('coach', 'jobs-prep', '--', 'NewCo', 'Widget Lead', 'Screen')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line)['skill'] for line in (self.root / 'logs/calls.jsonl').read_text().splitlines()]
+        self.assertEqual(calls, ['jobs-research', 'jobs-prep'])
+
+    def test_claude_adapter_selection(self):
+        self.fake.write_text('#!' + sys.executable + '\nimport json\nprint(json.dumps({"status":"complete", "summary":"Fictional Claude result"}))\n')
+        self.env.update(JOBFINDEROS_RUNTIME='claude', CLAUDE_BIN=str(self.fake))
+        result = self.run_agent('scout', 'jobs-scout')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.records()[0]['runtime'], 'claude')
 
 
 if __name__ == '__main__':

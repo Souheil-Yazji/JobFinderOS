@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""JobFinderOS scheduled guard: weekday daily jobs (local Claude skill)."""
+"""JobFinderOS scheduled guard: weekday daily jobs (local agent task)."""
 from __future__ import annotations
 
 import json

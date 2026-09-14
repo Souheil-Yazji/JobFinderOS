@@ -1,49 +1,24 @@
 #!/usr/bin/env bash
-# Preflight for local Claude Code skill automation.
+# Preflight the selected local runtime and canonical scheduled tasks.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-
-fail=0
-echo "=== JobFinderOS local runner preflight ==="
-
-CLAUDE_BIN="${CLAUDE_BIN:-$(command -v claude || true)}"
-if [[ -z "$CLAUDE_BIN" || ! -x "$CLAUDE_BIN" ]]; then
-  echo "FAIL: claude CLI not in PATH (install Claude Code CLI or set CLAUDE_BIN)"
-  fail=1
-else
-  echo "OK: claude at $CLAUDE_BIN ($("$CLAUDE_BIN" --version 2>/dev/null | head -1))"
-fi
-
-if [[ ! -d "$ROOT/vault" ]]; then
-  echo "FAIL: vault/ missing under $ROOT"
-  fail=1
-else
-  echo "OK: vault/ present"
-fi
-
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+runtime="${JOBFINDEROS_RUNTIME:-codex}"
+case "$runtime" in
+  codex) bin="${CODEX_BIN:-$(command -v codex || true)}" ;;
+  claude) bin="${CLAUDE_BIN:-$(command -v claude || true)}" ;;
+  *) echo "Unsupported runtime: $runtime" >&2; exit 2 ;;
+esac
+[[ -n "$bin" && -x "$bin" ]] || { echo "Missing $runtime CLI" >&2; exit 127; }
+"$bin" --version
 for skill in jobs-daily mark-weekly jobs-priority-watch; do
-  if [[ -f "$ROOT/.claude/commands/${skill}.md" ]]; then
-    echo "OK: skill .claude/commands/${skill}.md"
-  else
-    echo "WARN: missing .claude/commands/${skill}.md"
-  fi
-done
-
-if [[ -x "$ROOT/scripts/JobFinderOS_run_skill.sh" ]]; then
-  echo "OK: JobFinderOS_run_skill.sh executable"
+  "$ROOT/scripts/JobFinderOS_run_agent.sh" auto "$skill" --dry-run
+ done
+[[ -d "$ROOT/vault" ]] || { echo 'Missing vault'; exit 1; }
+if [[ "$runtime" == codex ]]; then
+  "$bin" login status
 else
-  echo "FAIL: scripts/JobFinderOS_run_skill.sh missing or not executable"
-  fail=1
+  "$bin" auth status
 fi
-
-if [[ "$fail" -eq 0 && -n "${CLAUDE_BIN:-}" ]]; then
-  echo
-  echo "--- claude auth status ---"
-  if ! "$CLAUDE_BIN" auth status 2>&1; then
-    echo "FAIL: claude auth status (run: claude auth login)"
-    fail=1
-  fi
-fi
-
-exit "$fail"
+echo "Runtime preflight passed. Web and Coach read-only email access must be validated in the selected runtime."

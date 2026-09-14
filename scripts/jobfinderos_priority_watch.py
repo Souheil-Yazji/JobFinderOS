@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""JobFinderOS scheduled guard: weekday priority-function watch (local Claude skill). Window from config/scheduler.yaml `watch:`."""
+"""JobFinderOS scheduled guard: weekday priority-function watch (local agent task). Window from config/scheduler.yaml `watch:`."""
 from __future__ import annotations
 
 import json

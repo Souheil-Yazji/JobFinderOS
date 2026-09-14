@@ -4,6 +4,25 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+if [[ "${1:-}" == --static ]]; then
+  PY="${JOBFINDEROS_PYTHON:-$ROOT/.venv/bin/python}"
+  [[ -x "$PY" ]] || PY=python3
+  "$PY" - <<'PYCODE'
+import sys
+from pathlib import Path
+import yaml
+sys.path.insert(0, str(Path.cwd() / "scripts"))
+from jobfinderos_agent_runner import definition
+mapping = yaml.safe_load(Path("config/skill_agents.yaml").read_text())
+for skill, agent in mapping.items():
+    definition(agent, skill)
+for skill in ("jobs-daily", "mark-weekly", "jobs-priority-watch"):
+    assert skill in mapping, skill
+print(f"Static automation verification passed: {len(mapping)} valid agent/skill pairs")
+PYCODE
+  exit 0
+fi
+
 TODAY="$(date +%Y-%m-%d)"
 CRON_DIR="$ROOT/logs/scheduler-cron"
 RUN_LOG="$ROOT/logs/launchd-runs.log"
