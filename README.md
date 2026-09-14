@@ -73,7 +73,7 @@ codex login
 Paste this block as one piece:
 
 ```bash
-git clone https://github.com/matthewprice/JobFinderOS.git
+git clone https://github.com/Souheil-Yazji/JobFinderOS.git
 cd JobFinderOS
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -377,3 +377,8 @@ digest, so a fresh checkout or weekly-only day can fail it. Use `--static` to ch
 configuration without a model or candidate data. The existing master scheduler
 uses system-local time; its priority guard honors `scheduler.yaml`'s timezone.
 This migration preserves that existing distinction.
+
+The [validation report](docs/codex-validation.md) distinguishes automated regression
+from real fictional persona runs and lists the remaining live Gmail/Claude parity
+gates. `tests/live_smoke.py` prepares an isolated fictional repository; add
+`--execute` to run the optional real-CLI smoke test.

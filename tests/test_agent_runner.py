@@ -130,6 +130,7 @@ if scenario != 'no-result':
     def test_daily_real_process_sequence_and_one_final_record(self):
         result = self.run_agent('coach', 'jobs-daily')
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.count('Fictional result'), 1)
         calls = [json.loads(line)['skill'] for line in (self.root / 'logs/calls.jsonl').read_text().splitlines()]
         self.assertEqual(calls, ['mark-pulse', 'jobs-scout', 'jobs-email', 'jobs-digest', 'jobs-daily-finalize'])
         manifests = list((self.root / 'logs/daily-runs').glob('*/run.json'))

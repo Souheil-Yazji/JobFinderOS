@@ -194,7 +194,9 @@ def invoke(agent, skill, arguments, label, interactive=False, runtime="codex", c
         if reports is not None:
             reports.append(dict(agent=agent, skill=skill, exit_code=rc, result_file=str(result_path.relative_to(ROOT)), run_id=run_id))
         event(label, f"{'completed' if rc == 0 else 'failed'} agent={agent} skill={skill} runtime={runtime} exit={rc} duration={record['duration_seconds']}s run={run_id}")
-    print(summary or f"{agent}/{skill}: exit {rc}; log: {folder / 'output.log'}")
+    # Daily child reads remain in their result files; show one consolidated read.
+    if context is None or skill == "jobs-daily-finalize" or rc != 0:
+        print(summary or f"{agent}/{skill}: exit {rc}; log: {folder / 'output.log'}")
     return rc
 
 
