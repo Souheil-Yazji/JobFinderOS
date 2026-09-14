@@ -1,0 +1,26 @@
+# Canonical skill ownership. Execution mode is declared in each skill.
+checkin: coach
+day-of-card: coach
+draft-message: coach
+email-watch: coach
+jobs-cover: coach
+jobs-daily: coach
+jobs-digest: coach
+jobs-email: coach
+jobs-prep: coach
+jobs-priority-watch: scout
+jobs-research: mark
+jobs-scout: scout
+mark-profiler: mark
+mark-pulse: mark
+mark-weekly: mark
+mock-interview: coach
+network-outreach: coach
+onboard: coach
+postmortem: coach
+profile: coach
+story: coach
+title-audit: mark
+voice-check: coach
+warm-path: coach
+whats-next: coach

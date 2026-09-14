@@ -318,3 +318,13 @@ The most valuable contribution is a new skill. Each file in `.claude/commands/` 
 - **Scrub before you push.** Check the diff for your own profile, wins, contacts, or vault notes. The `.gitignore` covers the usual paths, but a copied example can slip through.
 
 Say in the pull request what the skill is for, which agent runs it, and what it wrote to the vault when you ran it. MIT licensed, so contributions are too.
+
+## Codex port: canonical definitions
+
+Runtime-neutral personas are in `agents/`, tasks in `skills/`, and ownership in
+`config/skill_agents.yaml`. Shared directives and note templates are in
+`docs/jobfinderos-instructions.md` and `docs/vault-note-templates.md`.
+Claude commands remain available under `.claude/`. The Codex execution runner
+and scheduler integration follow in separate changes; copying these Markdown
+files does not register native Codex skills. Candidate state stays in `config/`
+and `vault/`, and learned preferences stay in `config/voice.md`.
