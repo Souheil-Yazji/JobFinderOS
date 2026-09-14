@@ -19,7 +19,6 @@ Pipeline:
       -> diff against the seen-set (~/.jobfinderos/ats_seen.json)
       -> append survivors to vault/Market Intel/ATS Inbox.md (unscored)
       -> desktop-notify only the clean-location ones (tight match)
-      -> optionally (--push) commit + push just the inbox
 
 Scoring is deliberately NOT done here - the /jobs-daily digest reads the
 inbox and applies config/scoring_rubric.md. This script only decides what is
@@ -30,7 +29,6 @@ Flags:
                  scaffold, notify nothing, commit nothing. Run this ONCE at
                  install so the first real run surfaces only genuinely new reqs.
     --dry-run    fetch + decide + print. Touches no state, no vault, no git.
-    --push       after a real run, git commit + push the inbox (off by default).
     --status     print seen-set size and last-run info, then exit.
 """
 
@@ -576,39 +574,6 @@ def notify(tight: list[Req]) -> None:
         log(f"WARN: notification failed ({exc})")
 
 
-def git(*args, check=False):
-    return subprocess.run(
-        ["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=120, check=check
-    )
-
-
-def push_inbox(count: int) -> None:
-    """Commit + push ONLY the inbox, so the cloud digest can score it."""
-    try:
-        pull = git("pull", "--rebase", "--autostash", "origin", "main")
-        if pull.returncode != 0:
-            log(f"WARN: pull failed, continuing: {pull.stderr.strip()[:200]}")
-        rel = str(INBOX.relative_to(ROOT))
-        git("add", rel)
-        staged = git("diff", "--cached", "--quiet")
-        if staged.returncode == 0:
-            log("nothing staged; skipping commit")
-            return
-        msg = f"ats-poll: {count} new req(s) {now().strftime('%Y-%m-%d')}"
-        c = git("commit", "-m", msg)
-        if c.returncode != 0:
-            log(f"WARN: commit failed: {c.stderr.strip()[:200]}")
-            return
-        p = git("push", "origin", "main")
-        if p.returncode != 0:
-            log(f"WARN: push failed (inbox persists locally, next run retries): "
-                f"{p.stderr.strip()[:200]}")
-        else:
-            log("inbox pushed to origin")
-    except Exception as exc:
-        log(f"WARN: git step failed ({exc}) - inbox still written locally")
-
-
 # ---------------------------------------------------------------- main
 
 
@@ -616,7 +581,6 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="JobFinderOS local direct-ATS poller")
     ap.add_argument("--seed", action="store_true", help="mark all current reqs seen; write nothing else")
     ap.add_argument("--dry-run", action="store_true", help="print decisions, change nothing")
-    ap.add_argument("--push", action="store_true", help="after a real run, git commit + push the inbox")
     ap.add_argument("--status", action="store_true", help="print state and exit")
     args = ap.parse_args()
 
@@ -684,8 +648,6 @@ def main() -> int:
     seen.update(r.req_id for r in fresh)
     save_seen(seen, note=f"{len(fresh)} new on {now().strftime('%Y-%m-%d')}")
     notify(tight)
-    if args.push:
-        push_inbox(len(fresh))
     return 0
 
 

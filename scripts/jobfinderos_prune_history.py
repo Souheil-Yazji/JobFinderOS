@@ -2,9 +2,9 @@
 """
 JobFinderOS - vault history retention pruner.
 ================================================================================
-Deletes historical, write-only vault notes past their retention window. Git is
-the permanent archive (every pruned file stays recoverable via `git show`);
-pruning exists to keep Obsidian search and agent greps free of stale noise.
+Deletes historical vault notes past their retention window to keep search
+results current. Backups are managed separately by the candidate; ignored
+notes are not recoverable from Git unless explicitly backed up beforehand.
 
 Policy:
   30 days : Daily Digests/, Archive/Daily Jobs Watch/, Archive/Daily Marketing
@@ -18,35 +18,21 @@ Safety rails:
   * The NEWEST file in each rule group is always kept, however old - the skills
     read "the most recent" digest/pulse, and a stalled pipeline must not lose
     its only copy.
-  * Deletions are committed on their own and pushed (same HTTPS/keychain flow
-    as jobfinderos_ats_poll.py). --dry-run prints, touches nothing.
+  * Changes stay local. This helper never invokes Git.
+  * --dry-run prints retention decisions without deleting notes.
 
 Flags:
   --dry-run   print what would be deleted, change nothing
-  --no-push   delete + commit, but skip the push (local testing)
 """
 
 from __future__ import annotations
 
 import argparse
 import fnmatch
-import os
 import re
-import subprocess
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-
-try:
-    from zoneinfo import ZoneInfo
-except Exception:  # pragma: no cover
-    ZoneInfo = None  # type: ignore
-
-# launchd starts with a minimal PATH - make git resolvable.
-os.environ["PATH"] = ":".join([
-    "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin", "/usr/sbin", "/sbin",
-    os.environ.get("PATH", ""),
-])
 
 ROOT = Path(__file__).resolve().parent.parent
 RUN_LOG = ROOT / "vault" / "Automation" / "JobFinderOS — Schedule & Run Log.md"
@@ -78,11 +64,6 @@ def log(msg: str) -> None:
             fh.write(line + "\n")
     except Exception:
         pass
-
-
-def git(*args: str, timeout: int = 120) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(ROOT), *args],
-                          capture_output=True, text=True, timeout=timeout)
 
 
 def file_date(name: str):
@@ -125,7 +106,7 @@ def append_run_log(n: int) -> None:
         with open(RUN_LOG, "a") as fh:
             fh.write(f"| {now():%Y-%m-%d %H:%M %Z} | prune-history | "
                      f"Pruned {n} vault history file(s) past retention "
-                     f"(30d digests/watch/pulse, 90d weekly). Full history stays in git. |\n")
+                     f"(30d digests/watch/pulse, 90d weekly). Backups are managed separately. |\n")
     except Exception as exc:
         log(f"WARN: run-log append failed: {exc}")
 
@@ -133,7 +114,6 @@ def append_run_log(n: int) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--no-push", action="store_true")
     args = ap.parse_args()
 
     today = now().date()
@@ -146,10 +126,6 @@ def main() -> int:
         log(f"DRY RUN - {len(doomed)} file(s) would be deleted")
         return 0
 
-    pull = git("pull", "--rebase", "--autostash", "origin", "main")
-    if pull.returncode != 0:
-        log(f"WARN: pull failed, continuing: {pull.stderr.strip()[:200]}")
-
     for p in doomed:
         try:
             p.unlink()
@@ -157,24 +133,7 @@ def main() -> int:
             log(f"WARN: could not delete {p.name}: {exc}")
     append_run_log(len(doomed))
 
-    rels = [str(p.relative_to(ROOT)) for p in doomed]
-    git("add", "--", str(RUN_LOG.relative_to(ROOT)), *rels)
-    if git("diff", "--cached", "--quiet").returncode == 0:
-        log("nothing staged; skipping commit")
-        return 0
-    msg = f"prune: vault history retention ({len(doomed)} files past 30/90d windows)"
-    c = git("commit", "-m", msg)
-    if c.returncode != 0:
-        log(f"WARN: commit failed: {c.stderr.strip()[:200]}")
-        return 1
-    if args.no_push:
-        log(f"committed {len(doomed)} deletions (push skipped)")
-        return 0
-    p = git("push", "origin", "main")
-    if p.returncode != 0:
-        log(f"WARN: push failed (will ride along with the next push): {p.stderr.strip()[:200]}")
-    else:
-        log(f"pruned {len(doomed)} file(s); committed + pushed")
+    log(f"pruned {len(doomed)} file(s) locally")
     return 0
 
 
