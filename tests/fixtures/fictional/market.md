@@ -1,0 +1,2 @@
+# Synthetic primary-source market snapshot
+Acme Widgets announced a funded widget research team expansion on 2026-09-14. Fictional source: https://example.com/acme/announcement. Dana Example is the named engineering hiring manager and holds the manager role's first-round interview. No other funding amount, signal, leader or company is established by this fixture. Produce only supported signals even when the task asks for a larger number. No contacts or messages have been sent.
