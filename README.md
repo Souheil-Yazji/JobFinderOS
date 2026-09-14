@@ -324,7 +324,29 @@ Say in the pull request what the skill is for, which agent runs it, and what it 
 Runtime-neutral personas are in `agents/`, tasks in `skills/`, and ownership in
 `config/skill_agents.yaml`. Shared directives and note templates are in
 `docs/jobfinderos-instructions.md` and `docs/vault-note-templates.md`.
-Claude commands remain available under `.claude/`. The Codex execution runner
-and scheduler integration follow in separate changes; copying these Markdown
-files does not register native Codex skills. Candidate state stays in `config/`
+Claude commands remain available under `.claude/`. Use `./scripts/JobFinderOS_run_agent.sh scout jobs-scout --dry-run` to inspect a
+task, then omit `--dry-run` to execute it with Codex. Copying these Markdown
+files does not register native Codex skills. Scheduling still uses Claude until
+the orchestration integration lands. Candidate state stays in `config/`
 and `vault/`, and learned preferences stay in `config/voice.md`.
+
+Manual Codex execution needs an authenticated Codex CLI on PATH (or `CODEX_BIN`)
+and the existing Python dependency (`pip install -r requirements.txt`). The runner
+reads repository files and uses `codex exec --sandbox workspace-write`; it never
+calls an LLM API directly. Optional `JOBFINDEROS_CODEX_MODEL` selects a model.
+
+```bash
+./scripts/JobFinderOS_run_agent.sh coach onboard --interactive
+./scripts/JobFinderOS_run_agent.sh scout jobs-scout
+./scripts/JobFinderOS_run_agent.sh mark mark-pulse
+./scripts/JobFinderOS_run_agent.sh coach jobs-prep -- "Acme" "Widget Lead" "Screen"
+```
+
+Conversation skills require `--interactive`. Arguments follow `--` and retain
+spaces. `JOBFINDEROS_SKILL_TIMEOUT_SEC` defaults to 1800. Logs and completion
+records are under ignored `logs/agent-runs/`; lifecycle events use the existing
+run log and vault mirror. The runner detects prohibited output changes and returns
+failure; it leaves those changes for inspection. This is detection, not a
+per-directory sandbox or a tool-level Gmail lock. Research needs live web access;
+Coach email work needs a separately configured read connector. Missing required
+inputs or tools must be reported as blocked. No inbox access is assumed.
