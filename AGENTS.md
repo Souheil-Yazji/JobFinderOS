@@ -4,7 +4,11 @@ Guidance for coding agents and IDE copilots working on this repository (the huma
 
 ## What this is
 
-An agentic job-search system on Claude Code: three personas in `.claude/agents/`, skills in `.claude/commands/`, doctrine in `config/recruiter_playbook.md`, output in an Obsidian vault at `vault/`. Scheduled runs go launchd → `scripts/scheduler_tick.py` → `scripts/JobFinderOS_run_skill.sh` → `claude -p /skill`.
+An agentic job-search system. Canonical personas live in `agents/`, tasks in `skills/`, shared instructions in `docs/jobfinderos-instructions.md`, note templates in `docs/vault-note-templates.md`, and doctrine in `config/recruiter_playbook.md`. Candidate configuration lives in `config/`; operational records live in `vault/`. Claude compatibility remains in `.claude/` and `CLAUDE.md`.
+
+Job-search execution must honor the selected persona and skill. Never simulate another persona inline; cross-agent work needs explicit orchestration. Always read `config/profile.md` and `config/scoring_rubric.md` when evaluating opportunities. Repository state overrides model memory. These job-search restrictions do not prohibit coding contributors from creating PRs when the user requests them.
+
+Planned canonical interface: `./scripts/JobFinderOS_run_agent.sh <agent> <skill>` (introduced in the runner phase). Until then, scheduled execution still uses `JobFinderOS_run_skill.sh` and Claude.
 
 ## Read first
 
