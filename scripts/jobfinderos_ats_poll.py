@@ -20,7 +20,7 @@ Pipeline:
       -> append survivors to vault/Market Intel/ATS Inbox.md (unscored)
       -> desktop-notify only the clean-location ones (tight match)
 
-Scoring is deliberately NOT done here - the /jobs-daily digest reads the
+Scoring is deliberately NOT done here - the /jobs-daily Scout pass reads the
 inbox and applies config/scoring_rubric.md. This script only decides what is
 worth showing a human.
 
@@ -523,12 +523,11 @@ INBOX_HEADER = """> **JobFinderOS:** ATS Poller · local direct-ATS sweep · [[D
 # ATS Inbox
 
 Newly-discovered reqs found by the local direct-ATS poller
-(`scripts/jobfinderos_ats_poll.py`), pending scoring by the daily digest.
+(`scripts/jobfinderos_ats_poll.py`), pending scoring by Scout.
 
 **How this works:** the poller is deterministic — it only filters (leadership title,
-location, comp floor) and diffs against a seen-set. It does **not** score. The daily
-digest reads every entry marked `**Status:** unscored`, scores it against
-`config/scoring_rubric.md`, promotes 7+ to an opportunity note, and flips the status
+location, comp floor) and diffs against a seen-set. It does **not** score. Scout reads every entry marked `**Status:** unscored`, scores it against
+`config/scoring_rubric.md`, promotes roles meeting the profile's threshold to an opportunity note, and flips the status
 to `scored`.
 
 Location flags: `clean` = remote / home region / country-wide. `⚠️` = hub-city-only at a

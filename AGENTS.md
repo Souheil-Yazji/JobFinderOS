@@ -8,7 +8,7 @@ An agentic job-search system. Canonical personas live in `agents/`, tasks in `sk
 
 Job-search execution must honor the selected persona and skill. Never simulate another persona inline; cross-agent work needs explicit orchestration. Always read `config/profile.md` and `config/scoring_rubric.md` when evaluating opportunities. Repository state overrides model memory. These job-search restrictions do not prohibit coding contributors from creating PRs when the user requests them.
 
-Canonical interface: `./scripts/JobFinderOS_run_agent.sh <agent> <skill>`. Manual Codex execution is available; scheduled execution still uses `JobFinderOS_run_skill.sh` and Claude.
+Canonical interface: `./scripts/JobFinderOS_run_agent.sh <agent> <skill>`. The Python scheduler invokes this interface and defaults to Codex. `JOBFINDEROS_RUNTIME=claude` selects the optional Claude adapter; the old `JobFinderOS_run_skill.sh <label> <skill>` interface remains a compatibility wrapper.
 
 ## Read first
 

@@ -11,6 +11,12 @@ Read `agents/scout.md` and `docs/jobfinderos-instructions.md` first.
 - `vault/Companies/` and `vault/Tracking/Companies.md` for what is already tracked
 
 ### Steps
+First read `vault/Market Intel/ATS Inbox.md` if present. Treat entries marked
+`**Status:** unscored` as candidate leads, verify against the supplied source,
+apply the profile filters/rubric and normal deduplication, and promote eligible
+roles through the steps below. Mark each processed entry `scored` with its score
+or exclusion reason; retain source details. Do not resurface already scored leads.
+
 1. Gather candidate roles: direct ATS fetches for every company in the profile's tiers and `config/targets.md`, then web search on the profile's role titles plus location phrasing (vary both). Merge and dedupe against the vault.
 2. Drop anything already tracked and anything at an excluded company or matching the excluded-profile pattern.
 3. Score each new role against the rubric. Apply the rubric's flags and the profile's hard filters.

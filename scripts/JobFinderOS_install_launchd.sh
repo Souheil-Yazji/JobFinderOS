@@ -8,6 +8,11 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export ROOT
+RUNTIME="${JOBFINDEROS_RUNTIME:-codex}"
+case "$RUNTIME" in codex|claude) ;; *) echo "Unsupported runtime: $RUNTIME" >&2; exit 2 ;; esac
+printf -v RUNTIME_Q '%q' "$RUNTIME"
+printf -v CODEX_BIN_Q '%q' "${CODEX_BIN:-$(command -v codex || true)}"
+printf -v CLAUDE_BIN_Q '%q' "${CLAUDE_BIN:-$(command -v claude || true)}"
 AGENT_DIR="${HOME}/Library/LaunchAgents"
 LAUNCHER_DIR="${HOME}/.jobfinderos"
 SCHEDULER_LABEL="com.jobfinderos.scheduler"
@@ -26,7 +31,7 @@ mkdir -p "$AGENT_DIR"
 mkdir -p "$ROOT/logs"
 mkdir -p "$ROOT/config"
 mkdir -p "$LAUNCHER_DIR"
-chmod +x "$ROOT/scripts/JobFinderOS_run_skill.sh" \
+chmod +x "$ROOT/scripts/JobFinderOS_run_agent.sh" "$ROOT/scripts/JobFinderOS_run_skill.sh" \
   "$ROOT/scripts/JobFinderOS_run_daily.sh" "$ROOT/scripts/JobFinderOS_run_weekly.sh" \
   "$ROOT/scripts/JobFinderOS_test_launchd.sh" "$ROOT/scripts/JobFinderOS_log_run.sh" \
   "$ROOT/scripts/jobfinderos_priority_watch.py" \
@@ -65,7 +70,10 @@ cat >"$SCHEDULER_LAUNCHER" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="${ROOT}"
-export PATH="\$ROOT/.venv/bin:\$PATH"
+export JOBFINDEROS_RUNTIME=${RUNTIME_Q}
+export CODEX_BIN=${CODEX_BIN_Q}
+export CLAUDE_BIN=${CLAUDE_BIN_Q}
+export PATH="\$ROOT/.venv/bin:\$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:\$PATH"
 cd "\$ROOT"
 mkdir -p "\$ROOT/logs"
 "\$ROOT/.venv/bin/python" "\$ROOT/scripts/scheduler_tick.py"
@@ -149,14 +157,14 @@ header = f"""> **JobFinderOS:** system · {ts}
 
 # JobFinderOS automation
 
-macOS **launchd** (user session). One **master** agent runs `scripts/scheduler_tick.py` every **{interval}s** (~{im} min) while the Mac is awake; the tick reads [[config/scheduler.yaml]] and `~/.jobfinderos/scheduler_state.json`, runs Claude Code skills when due, and invokes the priority-function watch guard each tick. Re-run `scripts/JobFinderOS_install_launchd.sh` to refresh.
+macOS **launchd** (user session). One **master** agent runs `scripts/scheduler_tick.py` every **{interval}s** (~{im} min) while the Mac is awake; the tick reads [[config/scheduler.yaml]] and `~/.jobfinderos/scheduler_state.json`, runs canonical agent tasks when due (Codex by default), and invokes the priority-function watch guard each tick. Re-run `scripts/JobFinderOS_install_launchd.sh` to refresh.
 
 ## Scheduled jobs (logical)
 
 | Job | After (local) | Entrypoint |
 |-----|----------------|------------|
-| Daily Jobs | Every day after **{dhm}** | `scheduler_tick` → `JobFinderOS_run_skill.sh jobs-daily` |
-| Weekly Mark | Weekday **{wd}** (0=Sun … 1=Mon) after **{whm}** | `scheduler_tick` → `JobFinderOS_run_skill.sh mark-weekly` |
+| Daily Jobs | Every day after **{dhm}** | `scheduler_tick` → `JobFinderOS_run_agent.sh coach jobs-daily` |
+| Weekly Mark | Weekday **{wd}** (0=Sun … 1=Mon) after **{whm}** | `scheduler_tick` → `JobFinderOS_run_agent.sh mark mark-weekly` |
 | Priority watch | Weekdays after the watch time in `config/scheduler.yaml` | `jobfinderos_priority_watch.py` → `/jobs-priority-watch` |
 
 **Rule — weekly wins:** If the weekly job runs on a calendar day, the daily job is skipped that day.

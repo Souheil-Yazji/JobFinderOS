@@ -39,7 +39,7 @@ score = Σ (dimension_score × dimension_weight)
 ## Action Thresholds
 | Score | Action |
 |-------|--------|
-| 8–10 | High priority — feature in the daily digest, generate tailored outreach |
+| 8–10 | High priority — feature in the daily digest; offer tailored outreach, draft only on consent |
 | 6–7 | Watch — log in the vault, include in weekly review |
 | 4–5 | Low signal — log only |
 | < 4 | Discard |
