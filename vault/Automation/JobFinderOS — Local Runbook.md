@@ -76,6 +76,10 @@ python3 scripts/jobfinderos_ats_poll.py --dry-run
 | Stuck lock | Remove `logs/scheduler-cron/*.lock` only after confirming no agent process is running |
 | launchd `Operation not permitted` | The repo is under `~/Documents`/`Desktop`/`Downloads`. Move it (e.g. `~/Developer/`) or grant Full Disk Access to the venv Python |
 | Session limit from the CLI | Wait for the reset; the tick logs `failed (exit 1)` without updating markers |
+| Browser bootstrap rejects `node:process` | Initialization failed before navigation. Record the error and plugin version; repair compatibility through the host/plugin's supported maintenance flow. Repository network flags do not fix a module import restriction. Continue supported direct-source reads; leave unverified coverage blocked. |
+| Public ATS returns HTTP 403 | Record URL/error and try an available supported browser/public source. Do not infer no openings or promote snippets to verified roles. Resume provisional notes when access returns. |
+| Careers page returns HTTP 200 but no requisitions | A landing page is not job verification. Read the specific official posting and its requirements before marking it verified. |
+| Scout exits 3 after saving notes | Read `result.json`: `blocked` preserves partial work and prevents a success marker. Resolve the missing capability and rerun Scout; reverify provisional notes rather than skipping them as duplicates. |
 
 ## Backup (optional, by hand)
 
