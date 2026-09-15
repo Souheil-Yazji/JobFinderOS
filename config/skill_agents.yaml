@@ -1,5 +1,6 @@
 # Canonical skill ownership. Execution mode is declared in each skill.
 checkin: coach
+company-discovery: mark
 day-of-card: coach
 draft-message: coach
 email-watch: coach

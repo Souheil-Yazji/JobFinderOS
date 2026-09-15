@@ -38,6 +38,10 @@ class MaintenanceRegression(unittest.TestCase):
                      'Weekly Brief — 2026-07-01.md', 'Weekly Brief — 2026-08-01.md',
                      'Jobs Handoff.json', 'ATS Inbox.md']
             for name in names: (folder / name).write_text('fictional fixture')
+            tracking = root / 'vault/Tracking'
+            tracking.mkdir()
+            for name in ['Company Discovery Queue.md', 'Company Universe.md']:
+                (tracking / name).write_text('durable fictional company state')
             with patch.object(pruner, 'ROOT', root), patch.object(pruner, 'log'):
                 doomed = pruner.collect(today)
             self.assertEqual([p.name for p in doomed], ['Market Pulse — 2026-07-01.md'])

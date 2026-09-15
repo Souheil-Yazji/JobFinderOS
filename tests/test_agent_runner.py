@@ -123,7 +123,7 @@ if scenario != 'no-result':
         self.assertFalse((self.root / 'logs/call.json').exists())
 
     def test_single_agent_smoke_interfaces(self):
-        for agent, skill in [('scout', 'jobs-scout'), ('mark', 'mark-pulse'), ('coach', 'jobs-digest'), ('coach', 'jobs-prep')]:
+        for agent, skill in [('scout', 'jobs-scout'), ('mark', 'mark-pulse'), ('mark', 'company-discovery'), ('coach', 'jobs-digest'), ('coach', 'jobs-prep')]:
             result = self.run_agent(agent, skill)
             self.assertEqual(result.returncode, 0, result.stderr)
 
