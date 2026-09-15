@@ -22,12 +22,15 @@ class CanonicalDefinitions(unittest.TestCase):
             self.assertNotIn(".claude/", content)
             self.assertNotIn("CLAUDE.md", content)
             self.assertNotIn("subagent_type", content)
-        for skill in ["jobs-daily", "mark-weekly", "jobs-priority-watch"]:
+        for skill in ["jobs-daily", "mark-weekly", "jobs-priority-watch", "company-discovery"]:
             self.assertIn(skill, mapping)
+        self.assertEqual(mapping["company-discovery"], "mark")
 
     def test_private_paths_and_tracked_exceptions(self):
         paths = [f"config/{n}.md" for n in ["profile", "scoring_rubric", "wins", "voice", "targets", "stories"]]
         paths += ["config/ats_boards.yaml", "vault/Companies/Acme/Role.md", "logs/test.log"]
+        paths += ["vault/Tracking/Company Discovery Queue.md", "vault/Tracking/Company Universe.md",
+                  "vault/Companies/Acme/Company Evaluation.md"]
         for path in paths:
             result = subprocess.run(["git", "check-ignore", "--no-index", path], cwd=ROOT, capture_output=True)
             self.assertEqual(result.returncode, 0, path)

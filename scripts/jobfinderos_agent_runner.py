@@ -17,6 +17,8 @@ from datetime import datetime
 
 import yaml
 
+from jobfinderos_company_universe import QUEUE, UNIVERSE, validate_queue, validate_universe
+
 ROOT = Path(__file__).resolve().parents[1]
 NAME = re.compile(r"[a-z][a-z0-9-]*\Z")
 PRIVATE_CONFIG = {f"config/{name}.md" for name in
@@ -61,7 +63,9 @@ def snapshot():
             rel = path.relative_to(ROOT)
             data = os.readlink(path).encode() if path.is_symlink() else path.read_bytes()
             stages = STAGE.findall(data.decode("utf-8", errors="replace")) if rel.parts[0] == "vault" else []
-            result[rel.as_posix()] = (hashlib.sha256(data).hexdigest(), stages)
+            # Keep registry text only in memory for ownership/format auditing.
+            registry = data.decode("utf-8", errors="replace") if rel.as_posix() in {QUEUE, UNIVERSE} else None
+            result[rel.as_posix()] = (hashlib.sha256(data).hexdigest(), stages, registry)
     return result
 
 
@@ -76,7 +80,15 @@ def violations(agent, skill, before, after):
         if name.startswith("config/"):
             allowed = name in PRIVATE_CONFIG and (agent == "coach" or (agent == "mark" and skill == "title-audit" and name == "config/profile.md"))
         if agent == "mark" and name.startswith("vault/"):
-            allowed = name in {"vault/Dashboard.md", "vault/Strategy.md"} or name.startswith("vault/Market Intel/") or name.startswith("vault/Companies/")
+            allowed = name in {"vault/Dashboard.md", "vault/Strategy.md", QUEUE, UNIVERSE} or name.startswith("vault/Market Intel/") or name.startswith("vault/Companies/")
+        if name in {QUEUE, UNIVERSE}:
+            new_text = after[name][2] if name in after else ""
+            allowed = agent == "mark"
+            if allowed:
+                try:
+                    (validate_queue if name == QUEUE else validate_universe)(new_text)
+                except (ValueError, TypeError):
+                    allowed = False
         if name in {"vault/Stories/_Story Template.md", "vault/Companies/README.md"}:
             allowed = False
         if agent != "coach" and name.startswith("vault/Outreach Drafts/"):
@@ -84,6 +96,8 @@ def violations(agent, skill, before, after):
         if agent == "scout" and name == "vault/Strategy.md":
             allowed = False
         if agent == "coach" and skill == "jobs-digest" and name == "vault/Strategy.md":
+            allowed = False
+        if name.startswith("vault/Companies/") and name.endswith("/Company Evaluation.md") and agent != "mark":
             allowed = False
         if agent == "mark" and before.get(name, (None, []))[1] != after.get(name, (None, []))[1]:
             allowed = False

@@ -111,3 +111,15 @@ verification still requires today's digest and can fail on a fresh checkout or a
 weekly-only day. Scheduler dry-run is read-only. The existing timezone distinction
 is retained: master daily/weekly use system-local time, while the priority guard
 uses the configured timezone. Optional helpers retain their existing triggers.
+
+## Company discovery
+
+`./scripts/JobFinderOS_run_agent.sh mark company-discovery` manually evaluates the
+private company queue and universe. Phases 1–2 do not add weekly, monthly or Scout
+integration. The scheduler and existing profile/targets scans remain unchanged.
+
+The universe, queue and company evaluations are Mark-owned in this phase. The
+runner audits ownership, table formats, status/score ranges and automatic tier
+caps. Invalid output produces exit 4 and leaves local changes for review, as with
+other boundary violations. This is an output audit, not a tool-level write lock or
+a substitute for primary-source evidence. See `docs/company-universe.md`.

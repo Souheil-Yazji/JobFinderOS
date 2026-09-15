@@ -44,7 +44,7 @@ JobFinderOS is a set of agent personas and skills that run through Codex CLI (wi
 >
 > Candidate records live in local `config/` and `vault/`. Private configuration, generated notes and logs are gitignored. Some shipped vault skeletons (Dashboard, Strategy, tracking tables and automation notes) remain tracked; keep filled-in versions out of commits. The selected CLI/model service processes the information a session reads. Job-search automation never commits, pushes, sends messages, or creates Gmail drafts.
 
-**Skills are the tasks you run.** Each is a short Markdown prompt in `skills/`, with an owner listed in `config/skill_agents.yaml`. There are 25 user-facing tasks plus an internal daily finalizer. Run them with `./scripts/JobFinderOS_run_agent.sh <agent> <skill>`. Section 3 uses `/skill` as shorthand for task names; those remain native slash commands only in the retained Claude compatibility files.
+**Skills are the tasks you run.** Each is a short Markdown prompt in `skills/`, with an owner listed in `config/skill_agents.yaml`. There are 26 user-facing tasks plus an internal daily finalizer. Run them with `./scripts/JobFinderOS_run_agent.sh <agent> <skill>`. Section 3 uses `/skill` as shorthand for task names; those remain native slash commands only in the retained Claude compatibility files.
 
 **Your config is what they read first.** `config/profile.md` says who you are and what you want. `config/scoring_rubric.md` says how to score a role. `config/recruiter_playbook.md` says how the agents behave. Section 4 explains that playbook in plain English.
 
@@ -167,6 +167,7 @@ The rule behind this is in Section 4.2. Short version: find a human first, apply
 ```
 /jobs-research <Company>   Business, funding, leadership, product, how they sell, open roles, an angle.
 /mark-profiler <Company>   A deeper evaluation for a real decision. Scored, with a verdict.
+/company-discovery         Discovers and scores companies; maintains the durable universe.
 /title-audit               Reads live postings and tells you what your job is called right now.
 ```
 
@@ -197,13 +198,25 @@ The rule behind this is in Section 4.2. Short version: find a human first, apply
 
 ### Reading the vault
 
+Mark maintains a durable company universe through the manually invoked
+`/company-discovery` task. It discovers and evaluates employers, records evidence,
+and promotes or demotes companies in private tracking notes and
+`Company Evaluation.md` files. This implements Phases 1–2: Scout consumption,
+Scout feedback, weekly integration and monthly auditing are deferred. Existing
+profile/targets scans continue as before. See [company-universe rules](docs/company-universe.md)
+for scoring, capacity limits, ownership and evidence requirements.
+
+```bash
+./scripts/JobFinderOS_run_agent.sh mark company-discovery
+```
+
 | Note | When to read it |
 |---|---|
 | `vault/Dashboard.md` | Every morning. Funnel pulse, plays for today, live threads, aging applications. |
 | `vault/Strategy.md` | Weekly. Positioning, the objection log, funnel history, proof assets, deadline math. |
 | `vault/Daily Digests/` | The morning briefing for each day. |
 | `vault/Companies/<Company>/` | One profile per company plus one note per role, with contacts and a timeline. |
-| `vault/Tracking/` | Contacts, the email follow-up queue, the company index. |
+| `vault/Tracking/` | Contacts, email queue, pipeline index, company discovery queue and company universe. |
 | `vault/Outreach Drafts/` | Every draft the coach has written. Nothing here has been sent. |
 | `vault/Market Intel/` | Weekly briefs, the market pulse, and the handoff file Mark writes for Scout. |
 
@@ -264,7 +277,7 @@ Set a deadline for having an offer in hand. Finals two weeks before that, hiring
 
 ```
 agents/              coach.md · scout.md · mark.md         canonical personas
-skills/              25 tasks + daily finalizer             canonical tasks
+skills/              26 tasks + daily finalizer             canonical tasks
 .claude/             retained Claude compatibility
 config/skill_agents.yaml                                 explicit ownership
 config/              profile, rubric, wins, voice, targets  your copies are gitignored; templates ship

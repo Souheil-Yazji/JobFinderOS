@@ -1,5 +1,83 @@
 # Vault note templates
 
+### Company discovery queue — `vault/Tracking/Company Discovery Queue.md`
+
+Mark owns all queue writes in Phases 1–2; Scout feedback is deferred. Use plain careers
+URLs, `—` for unavailable optional cells, and `&#124;` for a literal pipe inside
+a cell. Keep the table as the final content with a trailing newline for future
+append-only feedback. Store review history in company evaluations.
+
+```markdown
+# Company Discovery Queue
+
+| Company | Discovery source | Why it may fit | Date discovered | Status | Role found | Role score | Careers URL | Added by | Evaluation |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+```
+
+### Company universe — `vault/Tracking/Company Universe.md`
+
+Mark owns this table. Company Fit is a numeric 1–10 weighted score, separate from
+role fit. Evaluation links to `Companies/<Company>/Company Evaluation`. Careers
+URL is a plain employer/ATS URL; unknown is permitted only outside direct tiers.
+Keep lifecycle metadata above the table and decision history in evaluations.
+
+```markdown
+# Company Universe
+
+| Company | Status | Company Fit | Category | Careers URL | ATS | Why It Fits | Last Evaluated | Evaluation |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+```
+
+### Company evaluation — `vault/Companies/<Company>/Company Evaluation.md`
+
+```markdown
+> **JobFinderOS:** Mark · YYYY-MM-DD HH:MM TZ
+
+## Navigation
+- [[Tracking/Company Universe]] · [[Tracking/Company Discovery Queue]] · [[Dashboard]]
+
+# Company Evaluation — <Company>
+
+## Discovery path
+- Seed company/category, graph relationship, discovery source and date:
+
+## Why this company
+- Domain alignment:
+- Technical-stack / demonstrated experience alignment:
+- Relevant role types and historical hiring:
+- Location / employment compatibility:
+- Compensation evidence or unknown:
+- Growth/hiring evidence:
+
+## Company Fit
+| Dimension | Weight | Score | Evidence / uncertainty |
+| --- | --- | --- | --- |
+| Domain/career fit | 25% | | |
+| Probability of relevant roles | 20% | | |
+| Technical-stack overlap | 20% | | |
+| Compensation potential | 10% | | |
+| Location/remote compatibility | 10% | | |
+| Growth/hiring signal | 10% | | |
+| Warm-path potential | 5% | | |
+
+- **Weighted total:**
+
+## Evidence
+- Product/company source, source date and access date:
+- Careers URL and ATS; verification date and result:
+- Recent signal source; distinguish event date from publication date:
+
+## Risks
+- Fit concerns, unknowns, hiring/location concerns and blocked checks:
+
+## Recommendation
+- Tier 1 / Tier 2 / Watch / Dormant / Rejected, reason and capacity constraints:
+
+## Decision history
+| Date | Previous status | New status | Reason / new evidence |
+| --- | --- | --- | --- |
+```
+
 ### Company profile — `vault/Companies/<Company>/<Company>.md`
 
 One profile per employer (funding, go-to-market, org, locations, **contacts**, **communication log**). Start with a **Navigation** block. When other notes exist in the same folder, a **Roles & docs** line lists wikilinks to them.
